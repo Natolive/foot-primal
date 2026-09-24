@@ -26,22 +26,8 @@
     {
       "idx": 3,
       "version": "7",
-      "when": 1790259593655,
-      "tag": "0003_add_email_verification",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1790261259803,
-      "tag": "0004_add_email_verification_expiry",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1790261564414,
-      "tag": "0005_add_password_reset",
+      "when": 1790262611294,
+      "tag": "0003_email_verification_and_password_reset",
       "breakpoints": true
     }
   ]
