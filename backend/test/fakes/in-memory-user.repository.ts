@@ -5,7 +5,7 @@ import { InMemoryRepository } from './in-memory.repository.js';
 export class InMemoryUserRepository extends InMemoryRepository<User, NewUser> implements UserRepository {
   // Mêmes défauts que les colonnes en base.
   override create(data: NewUser) {
-    return super.create({ role: 'user', extraPermissions: [], ...data });
+    return super.create({ role: 'user', extraPermissions: [], onboardedAt: null, ...data });
   }
 
   async findByEmail(email: string) {

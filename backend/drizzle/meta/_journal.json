@@ -64,6 +64,13 @@
       "when": 1790242492164,
       "tag": "0008_add_admin_role",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1790255753655,
+      "tag": "0009_add_user_onboarded_at",
+      "breakpoints": true
     }
   ]
 }

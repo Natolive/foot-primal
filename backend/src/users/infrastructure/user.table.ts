@@ -13,5 +13,7 @@ export const users = pgTable('users', {
   role: role().notNull().default('user'),
   // Droits accordés en plus de ceux du rôle ; texte et non enum, comme dans role_permissions.
   extraPermissions: text('extra_permissions').array().$type<Permission[]>().notNull().default(sql`'{}'`),
+  // Visite guidée affichée ; null tant qu'elle ne l'a pas été.
+  onboardedAt: timestamp('onboarded_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });

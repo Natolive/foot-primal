@@ -11,6 +11,15 @@ describe('UsersService', () => {
     users = new UsersService(new InMemoryUserRepository());
   });
 
+  it('marks the guided tour as shown once and keeps the first date', async () => {
+    const lea = await users.create(person('lea@boite.fr'));
+    await users.completeOnboarding(lea.id);
+    const first = (await users.findById(lea.id)).onboardedAt;
+    expect(first).toBeInstanceOf(Date);
+    await users.completeOnboarding(lea.id);
+    expect((await users.findById(lea.id)).onboardedAt).toBe(first);
+  });
+
   it('updates the profile, role and extra permissions of someone else, one at a time', async () => {
     const admin = toPublicUser(await users.create({ ...person('admin@boite.fr'), role: 'super_admin' }));
     const lea = await users.create(person('lea@boite.fr'));

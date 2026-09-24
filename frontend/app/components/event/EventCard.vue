@@ -38,7 +38,7 @@ async function answer(attending: boolean) {
 </script>
 
 <template>
-  <UCard :ui="{ root: 'row-span-6 grid grid-rows-subgrid gap-y-0 p-4 sm:p-6', body: 'contents' }">
+  <UCard data-tour="event" :ui="{ root: 'row-span-6 grid grid-rows-subgrid gap-y-0 p-4 sm:p-6', body: 'contents' }">
     <div class="flex items-start justify-between gap-3">
       <div class="min-w-0">
         <p class="text-primary text-sm font-semibold first-letter:uppercase">{{ when }}</p>
@@ -87,6 +87,7 @@ async function answer(attending: boolean) {
       <UButton
         v-if="event.paymentUrl"
         :to="event.paymentUrl"
+        data-tour="pay"
         target="_blank"
         rel="noopener noreferrer"
         color="neutral"
@@ -98,7 +99,7 @@ async function answer(attending: boolean) {
       >
         Payer ma place
       </UButton>
-      <div v-if="can('events.participate')" class="grid grid-cols-2 gap-2">
+      <div v-if="can('events.participate')" data-tour="answer" class="grid grid-cols-2 gap-2">
         <UButton
           :variant="coming ? 'solid' : 'outline'"
           :icon="coming ? 'i-lucide-circle-check' : 'i-lucide-user-plus'"

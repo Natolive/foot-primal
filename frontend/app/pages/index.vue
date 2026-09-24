@@ -3,6 +3,7 @@ import { eventSchema, type EventDto, type EventInput, type SaveEventDto } from '
 import type { FormFieldConfig } from '~/types/form'
 
 useHead({ title: 'Créneaux · Primal' })
+const { demo } = useOnboardingTour()
 
 const api = useApi()
 const toast = useToast()
@@ -84,7 +85,8 @@ async function confirmDelete() {
       <UButton v-if="canCreate" icon="i-lucide-plus" size="lg" class="font-semibold" @click="openCreate">Créer un créneau</UButton>
     </div>
 
-    <div v-if="events.length" class="mt-10 grid gap-6 md:grid-cols-2">
+    <div v-if="events.length || demo" class="mt-10 grid gap-6 md:grid-cols-2">
+      <EventCard v-if="demo" :event="demo" />
       <EventCard
         v-for="event in events"
         :key="event.id"

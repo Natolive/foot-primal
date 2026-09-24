@@ -41,6 +41,35 @@
   }
 }
 
+/* Visite guidée (driver.js) aux couleurs de l'appli. */
+.driver-popover.primal-tour {
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  border: 1px solid var(--ui-border);
+  font-family: var(--font-sans);
+}
+.primal-tour .driver-popover-title {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  font-size: 1.5rem;
+  color: var(--ui-text-highlighted);
+}
+.primal-tour .driver-popover-description,
+.primal-tour .driver-popover-progress-text { color: var(--ui-text-muted); }
+.primal-tour .driver-popover-arrow { border-color: var(--ui-bg); }
+.primal-tour .driver-popover-footer button {
+  text-shadow: none;
+  border-radius: var(--ui-radius);
+  border-color: var(--ui-border);
+  background: var(--ui-bg-elevated);
+  color: var(--ui-text);
+}
+.primal-tour .driver-popover-next-btn {
+  background: var(--ui-primary);
+  border-color: var(--ui-primary);
+  color: white;
+}
+
 /* Transition entre pages (le layout reste en place, seul le contenu glisse). */
 .page-enter-active,
 .page-leave-active {

@@ -17,7 +17,7 @@ const HOUR = 60 * 60 * 1000;
 export const SESSION_TTL = { short: 12 * HOUR, remember: 30 * 24 * HOUR };
 
 // Utilisateur renvoyé au front, avec ses droits effectifs : ceux du rôle plus ceux ajoutés à la personne.
-export type AuthenticatedUser = PublicUser & { permissions: Permission[] };
+export type AuthenticatedUser = PublicUser & { onboarded: boolean; permissions: Permission[] };
 
 export interface OpenedSession {
   token: string;
@@ -69,6 +69,10 @@ export class AuthService {
     if (!user.permissions.includes(permission)) throw new MissingPermissionError();
   }
 
+  completeOnboarding(user: AuthenticatedUser): Promise<void> {
+    return this.users.completeOnboarding(user.id);
+  }
+
   async logout(token: string | undefined): Promise<void> {
     if (token) await this.sessions.deleteByTokenHash(hashToken(token));
   }
@@ -76,6 +80,6 @@ export class AuthService {
   private async withPermissions(user: User): Promise<AuthenticatedUser> {
     const fromRole = await this.roles.permissionsOf(user.role);
     const permissions = PERMISSIONS.filter((p) => fromRole.includes(p) || user.extraPermissions.includes(p));
-    return { ...toPublicUser(user), permissions };
+    return { ...toPublicUser(user), onboarded: user.onboardedAt !== null, permissions };
   }
 }

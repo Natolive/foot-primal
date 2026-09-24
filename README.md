@@ -34,6 +34,7 @@ frontend/   Nuxt 4
   app/components/brand/  logo, élément graphique
   app/components/event/  EventCard (créneau, places, réponses au sondage)
   app/components/form/   FormBuilder (formulaire généré depuis une liste de champs + schéma)
+  app/composables/       useApi, useAuth, useOnboardingTour (visite guidée driver.js)
   app/layouts/           default (navbar), auth (bandeau de marque sur grand écran + formulaire)
   app/pages/             index (créneaux), login, signup, users (administration), roles (droits des rôles)
   app/utils/             permissionGroups (droits groupés par catégorie)
@@ -52,6 +53,15 @@ Tests back : `docker compose exec backend npm test` (unitaires), `docker compose
 - Chacun répond au sondage « je viens » / « je ne viens pas » jusqu'au début du match ; seuls les « je viens » prennent une place.
 - Rôles : `user` répond aux sondages, `admin` organise aussi les créneaux (catégorie de droits `planning`), `super_admin` a tout.
   Premier super admin : `UPDATE users SET role = 'super_admin' WHERE email = '…'`.
+
+## Visite guidée
+
+- Après l'inscription, la personne est connectée et arrive sur les créneaux, où une visite guidée (driver.js) montre
+  un créneau, le sondage et le lien de paiement.
+- Elle s'affiche une seule fois par compte : `POST /auth/me/onboarding` (droit `profile.complete_onboarding`) remplit
+  `users.onboarded_at` dès l'affichage, renvoyé dans `UserDto.onboarded`.
+- Le temps de la visite, un créneau d'exemple non cliquable est affiché en tête de liste, même sans vrai créneau.
+- Revoir la visite : `UPDATE users SET onboarded_at = NULL WHERE email = '…'`.
 
 ## Production
 

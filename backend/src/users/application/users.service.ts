@@ -17,6 +17,12 @@ export class UsersService extends BaseService<User, NewUser> {
     return this.repository.findByEmail(email);
   }
 
+  // Idempotent : la date de la première visite est conservée.
+  async completeOnboarding(id: string): Promise<void> {
+    const user = await this.findById(id);
+    if (!user.onboardedAt) await this.update(id, { onboardedAt: new Date() });
+  }
+
   async findAllManaged(): Promise<ManagedUserDto[]> {
     const users = await this.findAll();
     return users

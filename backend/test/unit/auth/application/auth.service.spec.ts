@@ -80,7 +80,7 @@ describe('AuthService', () => {
   describe('authorize', () => {
     it('checks the effective permissions of the role', async () => {
       const user = await auth.signup(dto);
-      expect(user).toMatchObject({ role: 'user', permissions: ['profile.read', 'events.read', 'events.participate'] });
+      expect(user).toMatchObject({ role: 'user', permissions: ['profile.read', 'profile.complete_onboarding', 'events.read', 'events.participate'] });
       expect(() => auth.authorize(user, 'profile.read')).not.toThrow();
       expect(() => auth.authorize(user, 'roles.update')).toThrow(MissingPermissionError);
     });
@@ -89,7 +89,7 @@ describe('AuthService', () => {
       await auth.signup(dto);
       users.rows[0].extraPermissions = ['users.read'];
       const { token } = await auth.login(credentials);
-      expect((await auth.authenticate(token)).permissions).toEqual(['profile.read', 'users.read', 'events.read', 'events.participate']);
+      expect((await auth.authenticate(token)).permissions).toEqual(['profile.read', 'profile.complete_onboarding', 'users.read', 'events.read', 'events.participate']);
     });
   });
 });

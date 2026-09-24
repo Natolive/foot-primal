@@ -7,5 +7,7 @@ export interface UserDto {
   firstName: string
   lastName: string
   role: Role
+  // Visite guidée déjà affichée : elle ne revient plus.
+  onboarded: boolean
   permissions: Permission[]
 }

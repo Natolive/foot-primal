@@ -8,12 +8,13 @@ export interface User {
   passwordHash: string;
   role: Role;
   extraPermissions: Permission[];
+  onboardedAt: Date | null;
   createdAt: Date;
 }
 
-// Rôle et droits en plus facultatifs à la création : `user` et aucun par défaut en base.
-export type NewUser = Omit<User, 'id' | 'createdAt' | 'role' | 'extraPermissions'> &
-  Partial<Pick<User, 'role' | 'extraPermissions'>>;
+// Rôle, droits en plus et visite guidée facultatifs à la création : `user`, aucun et null par défaut en base.
+export type NewUser = Omit<User, 'id' | 'createdAt' | 'role' | 'extraPermissions' | 'onboardedAt'> &
+  Partial<Pick<User, 'role' | 'extraPermissions' | 'onboardedAt'>>;
 
 // Ce qui peut sortir de l'API : jamais le hash du mot de passe.
 export type PublicUser = Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'role'>;

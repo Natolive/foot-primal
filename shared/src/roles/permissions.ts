@@ -1,6 +1,7 @@
 // Un droit par action protégée de l'API ; nouvelle action = nouveau droit ici, avec son libellé.
 export const PERMISSIONS = [
   'profile.read',
+  'profile.complete_onboarding',
   'roles.read',
   'roles.update',
   'users.read',
@@ -17,6 +18,7 @@ export type Permission = (typeof PERMISSIONS)[number]
 
 export const PERMISSION_LABELS: Record<Permission, string> = {
   'profile.read': 'Voir son profil',
+  'profile.complete_onboarding': 'Terminer la visite guidée',
   'roles.read': 'Voir les rôles et leurs droits',
   'roles.update': 'Modifier les droits des rôles',
   'users.read': 'Voir les utilisateurs',

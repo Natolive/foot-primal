@@ -33,6 +33,13 @@ export class AuthController {
     clearSessionCookie(res);
   }
 
+  @Post('me/onboarding')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Authorize('profile.complete_onboarding')
+  completeOnboarding(@CurrentUser() user: UserDto): Promise<void> {
+    return this.auth.completeOnboarding(user);
+  }
+
   @Get('me')
   @Authorize('profile.read')
   me(@CurrentUser() user: UserDto): UserDto {

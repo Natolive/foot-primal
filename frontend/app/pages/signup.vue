@@ -16,10 +16,12 @@ const fields: FormFieldConfig<SignupDto>[] = [
 
 const toast = useToast()
 const api = useApi()
+const { login } = useAuth()
 
 async function signup(data: SignupDto) {
   try {
     await api('/auth/signup', { method: 'POST', body: data })
+    await login({ email: data.email, password: data.password })
   } catch (e) {
     toast.add({
       title: 'Création du compte impossible',
@@ -29,8 +31,8 @@ async function signup(data: SignupDto) {
     })
     return
   }
-  toast.add({ title: 'Compte créé', description: 'Tu peux maintenant te connecter.', color: 'success', icon: 'i-lucide-check' })
-  await navigateTo('/login')
+  toast.add({ title: 'Compte créé', description: 'Bienvenue sur Primal.', color: 'success', icon: 'i-lucide-check' })
+  await navigateTo('/')
 }
 </script>
 
