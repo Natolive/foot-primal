@@ -1,4 +1,4 @@
-import type { Permission } from '@primal/shared'
+import type { Permission } from '@footix/shared'
 
 // Sous-pages de /settings (menu de la barre et onglets), chacune derrière son droit de lecture.
 export const settingsLinks = [

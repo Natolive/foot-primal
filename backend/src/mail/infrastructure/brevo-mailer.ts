@@ -18,7 +18,7 @@ export class BrevoMailer extends Mailer {
       method: 'POST',
       headers: { 'api-key': apiKey, 'content-type': 'application/json', accept: 'application/json' },
       body: JSON.stringify({
-        sender: { name: 'Primal', email: process.env.MAIL_FROM },
+        sender: { name: 'Footix', email: process.env.MAIL_FROM },
         to: [to],
         subject,
         htmlContent: html,

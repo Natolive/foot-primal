@@ -3,23 +3,57 @@ import { html, type SafeHtml } from '../html.js';
 // Adresse du front, pour les liens des emails.
 export const appUrl = (path: string) => `${process.env.APP_URL}${path}`;
 
-// Bouton d'action : lien stylé en ligne, seul style que les clients mail respectent partout.
-export const button = (label: string, href: string) =>
-  html`<a href="${href}" style="display:inline-block;padding:12px 20px;background:#0f1b3d;color:#ffffff;text-decoration:none;font-weight:bold;border-radius:6px">${label}</a>`;
+// Couleurs de l'appli (frontend/app/assets/css/main.css), en dur : les clients mail ignorent les variables CSS.
+const BLUE = '#2d4bff';
+const NIGHT = '#121a4a';
+const TEXT = '#334155';
+const MUTED = '#64748b';
+const FONT = "'Helvetica Neue',Helvetica,Arial,sans-serif";
 
-// Cadre commun à tous les emails : un template ne fournit que son contenu.
-export const layout = (title: string, content: SafeHtml): string =>
+// Bouton en tableau : seul rendu fiable partout, Outlook compris. Le lien est aussi donné en clair en dessous.
+export const button = (label: string, href: string) =>
+  html`<table role="presentation" cellpadding="0" cellspacing="0" style="margin:32px 0 8px">
+  <tr><td style="border-radius:12px;background:${BLUE}">
+    <a href="${href}" style="display:inline-block;padding:15px 28px;font-family:${FONT};font-size:16px;font-weight:bold;color:#ffffff;text-decoration:none;border-radius:12px">${label}</a>
+  </td></tr>
+</table>
+<p style="margin:0 0 24px;font-size:13px;line-height:1.5;color:${MUTED}">Le bouton ne marche pas ? Copie ce lien dans ton navigateur :<br><a href="${href}" style="color:${BLUE};word-break:break-all">${href}</a></p>`;
+
+// Précision en petit sous le bouton (validité du lien, que faire si ce n'est pas toi).
+export const note = (text: string) =>
+  html`<p style="margin:0;padding-top:24px;border-top:1px solid #e2e8f0;font-size:14px;line-height:1.6;color:${MUTED}">${text}</p>`;
+
+export const paragraph = (text: string) => html`<p style="margin:0 0 16px">${text}</p>`;
+
+// Cadre commun à tous les emails : bandeau terrain + logo, titre, contenu, pied de page.
+// `preheader` : aperçu affiché après l'objet dans la boîte de réception, invisible dans l'email.
+export const layout = ({ title, preheader, content }: { title: string; preheader: string; content: SafeHtml }): string =>
   html`<!doctype html>
 <html lang="fr">
-  <body style="margin:0;padding:24px;background:#f4f4f5;font-family:Arial,sans-serif;color:#18181b">
-    <table role="presentation" width="100%" style="max-width:560px;margin:0 auto;background:#ffffff;border-radius:8px">
-      <tr><td style="padding:32px">
-        <h1 style="margin:0 0 24px;font-size:24px;text-transform:uppercase">${title}</h1>
-        ${content}
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title>${title}</title>
+  </head>
+  <body style="margin:0;padding:0;background:#f4f6ff">
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0">${preheader}</div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6ff">
+      <tr><td align="center" style="padding:32px 16px">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:20px;overflow:hidden">
+          <tr><td style="background:${BLUE}">
+            <a href="${appUrl('/')}"><img src="${appUrl('/email/header.png')}" width="600" alt="Footix" style="display:block;width:100%;height:auto;border:0;color:#ffffff;font-family:${FONT};font-size:28px;font-weight:bold;line-height:80px;text-indent:44px"></a>
+          </td></tr>
+          <tr><td style="padding:40px 44px 44px;font-family:${FONT};font-size:16px;line-height:1.6;color:${TEXT}">
+            <h1 style="margin:0 0 20px;font-size:26px;line-height:1.2;letter-spacing:-0.02em;color:${NIGHT}">${title}</h1>
+            ${content}
+          </td></tr>
+        </table>
+        <p style="margin:24px 0 0;font-family:${FONT};font-size:12px;line-height:1.6;color:${MUTED}">
+          Footix, les créneaux de foot de la boîte.<br>
+          <a href="${appUrl('/')}" style="color:${MUTED}">${appUrl('/')}</a>
+        </p>
       </td></tr>
     </table>
-    <p style="max-width:560px;margin:16px auto 0;font-size:12px;color:#71717a;text-align:center">
-      Primal · <a href="${appUrl('/')}" style="color:#71717a">${appUrl('/')}</a>
-    </p>
   </body>
 </html>`.value;

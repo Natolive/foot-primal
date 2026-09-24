@@ -1,4 +1,4 @@
-import type { EventDto } from '@primal/shared';
+import type { EventDto } from '@footix/shared';
 import type { User } from '../../users/domain/user.entity.js';
 
 export interface Event {

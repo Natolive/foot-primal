@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ROLE_LABELS } from '@primal/shared'
+import { ROLE_LABELS } from '@footix/shared'
 import type { DropdownMenuItem } from '@nuxt/ui'
 
 const { user, logout } = useAuth()
@@ -29,10 +29,10 @@ const menu = computed<DropdownMenuItem[][]>(() => [
 
 <template>
   <div class="min-h-dvh">
-    <header class="navbar bg-ink text-chalk sticky top-0 z-40">
+    <header class="bg-default/75 border-default sticky top-0 z-40 border-b backdrop-blur-lg">
       <div class="mx-auto flex h-16 max-w-5xl items-center gap-2 px-4 sm:gap-6 sm:px-6">
         <NuxtLink to="/" class="shrink-0 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4" aria-label="Accueil">
-          <BrandLogo class="w-24 sm:w-32" />
+          <BrandLogo class="text-highlighted w-20 sm:w-24" />
         </NuxtLink>
 
         <nav aria-label="Navigation principale" class="flex flex-1 items-center gap-1 sm:justify-center">
@@ -43,9 +43,9 @@ const menu = computed<DropdownMenuItem[][]>(() => [
             exact
             color="neutral"
             variant="ghost"
-            class="hover:text-chalk font-medium hover:bg-white/10"
-            active-class="text-chalk bg-white/10"
-            inactive-class="text-chalk/70"
+            class="font-medium"
+            active-class="text-highlighted bg-elevated"
+            inactive-class="text-muted"
           >
             <span class="hidden sm:inline">Créneaux</span>
           </UButton>
@@ -56,8 +56,8 @@ const menu = computed<DropdownMenuItem[][]>(() => [
               aria-label="Paramètres"
               color="neutral"
               variant="ghost"
-              class="hover:text-chalk font-medium hover:bg-white/10"
-              :class="route.path.startsWith('/settings') ? 'text-chalk bg-white/10' : 'text-chalk/70'"
+              class="font-medium"
+              :class="route.path.startsWith('/settings') ? 'text-highlighted bg-elevated' : 'text-muted'"
             >
               <span class="hidden sm:inline">Paramètres</span>
             </UButton>
@@ -69,13 +69,13 @@ const menu = computed<DropdownMenuItem[][]>(() => [
             color="neutral"
             variant="ghost"
             trailing-icon="i-lucide-chevron-down"
-            class="text-chalk shrink-0 gap-2 px-1.5 hover:bg-white/10 sm:px-2"
+            class="shrink-0 gap-2 px-1.5 sm:px-2"
             :aria-label="`Compte de ${fullName}`"
           >
             <UAvatar :alt="fullName" size="sm" class="bg-primary text-white" :ui="{ fallback: 'text-white font-semibold' }" />
             <span class="hidden text-left leading-tight md:block">
-              <span class="block text-sm font-semibold">{{ user?.firstName }}</span>
-              <span v-if="user" class="text-chalk/60 block text-xs">{{ ROLE_LABELS[user.role] }}</span>
+              <span class="text-highlighted block text-sm font-semibold">{{ user?.firstName }}</span>
+              <span v-if="user" class="text-muted block text-xs">{{ ROLE_LABELS[user.role] }}</span>
             </span>
           </UButton>
         </UDropdownMenu>
@@ -87,10 +87,3 @@ const menu = computed<DropdownMenuItem[][]>(() => [
   </div>
 </template>
 
-<style scoped>
-/* Fil aux couleurs du « A » du logo, sous la barre. */
-.navbar {
-  border-bottom: 2px solid transparent;
-  border-image: linear-gradient(90deg, var(--color-brand-violet), var(--color-brand-blue), var(--color-brand-teal)) 1;
-}
-</style>

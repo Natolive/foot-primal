@@ -1,4 +1,4 @@
-import type { Permission, Role } from '@primal/shared';
+import type { Permission, Role } from '@footix/shared';
 
 // Droit accordé ou retiré à un rôle par un admin ; sans ligne, le droit par défaut s'applique.
 export interface RolePermission {

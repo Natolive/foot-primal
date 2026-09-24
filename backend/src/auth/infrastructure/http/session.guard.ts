@@ -1,6 +1,6 @@
 import { CanActivate, createParamDecorator, ExecutionContext, Injectable, SetMetadata } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import type { Permission } from '@primal/shared';
+import type { Permission } from '@footix/shared';
 import type { Request } from 'express';
 import { AuthService, type AuthenticatedUser } from '../../application/auth.service.js';
 import { readSessionCookie } from './session-cookie.js';

@@ -6,7 +6,7 @@ import {
   type ResetPasswordDto,
   type SignupDto,
   type VerifyEmailDto,
-} from '@primal/shared';
+} from '@footix/shared';
 import { createHash, randomBytes } from 'node:crypto';
 import { emailVerificationMail } from '../../mail/application/templates/email-verification.mail.js';
 import { passwordResetMail } from '../../mail/application/templates/password-reset.mail.js';

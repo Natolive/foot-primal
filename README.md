@@ -1,4 +1,4 @@
-# Primal
+# Footix
 
 Appli pour s'inscrire aux créneaux de foot proposés par la boîte.
 
@@ -10,14 +10,14 @@ docker compose up --build
 - http://api.footix.localhost — API NestJS
 - http://mail.footix.localhost — Mailpit : emails envoyés en dev (jamais vraiment envoyés)
 - http://traefik.footix.localhost — dashboard Traefik
-- PostgreSQL : `localhost:5432`, base/utilisateur/mot de passe `primal` (dev)
+- PostgreSQL : `localhost:5432`, base/utilisateur/mot de passe `footix` (dev)
 
 ## Structure
 
 Espace de travail npm (un seul `package-lock.json` à la racine) :
 
 ```
-shared/     @primal/shared : schémas Zod + types (DTO) partagés front/back
+shared/     @footix/shared : schémas Zod + types (DTO) partagés front/back
   src/common/   champs réutilisables (email, règles mot de passe)
   src/auth/     login, signup, verify-email, password-reset (.dto.ts)
   src/roles/    permissions.ts (droits, rôles, défauts), role.dto.ts
@@ -110,15 +110,15 @@ Migrations appliquées au démarrage de l'API, base et API non exposées.
 Mise en place, une fois :
 
 1. Serveur : Docker installé, `mkdir ~/footix` et y créer `.env` depuis `.env.example`.
-2. Clé SSH de la CI : `ssh-keygen -t ed25519 -f primal-ci -N ''`, ajouter `primal-ci.pub`
+2. Clé SSH de la CI : `ssh-keygen -t ed25519 -f footix-ci -N ''`, ajouter `footix-ci.pub`
    à `~/.ssh/authorized_keys` du serveur.
 3. GitHub → Settings → Environments → `production`, secrets :
-   `SSH_HOST`, `SSH_USER`, `SSH_PRIVATE_KEY` (contenu de `primal-ci`), `SSH_KNOWN_HOSTS` (sortie de `ssh-keyscan <hôte>`),
+   `SSH_HOST`, `SSH_USER`, `SSH_PRIVATE_KEY` (contenu de `footix-ci`), `SSH_KNOWN_HOSTS` (sortie de `ssh-keyscan <hôte>`),
    `BREVO_API_KEY` (clé API v3 `xkeysib-…`) : `gh secret set BREVO_API_KEY --env production` ;
    variable `MAIL_FROM` : `gh variable set MAIL_FROM --env production --body noreply@noreply.benit.ooo`.
    Les deux sont recopiés dans le `.env` du serveur à chaque déploiement.
    Brevo : expéditeur `noreply@noreply.benit.ooo` et domaine `noreply.benit.ooo` authentifiés (DNS).
 4. Premier push sur `main`, puis créer son compte et passer super admin :
-   `docker compose -f docker-compose.prod.yml exec db psql -U primal -c "UPDATE users SET role = 'super_admin' WHERE email = '…'"`.
+   `docker compose -f docker-compose.prod.yml exec db psql -U footix -c "UPDATE users SET role = 'super_admin' WHERE email = '…'"`.
 
 Revenir à une version : sur le serveur, `IMAGE_TAG=<commit> docker compose -f docker-compose.prod.yml up -d`.

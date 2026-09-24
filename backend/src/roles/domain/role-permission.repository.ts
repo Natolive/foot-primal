@@ -1,4 +1,4 @@
-import type { Role } from '@primal/shared';
+import type { Role } from '@footix/shared';
 import { BaseRepository } from '../../common/domain/base.repository.js';
 import type { NewRolePermission, RolePermission } from './role-permission.entity.js';
 

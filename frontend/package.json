@@ -12,7 +12,7 @@
   "dependencies": {
     "@iconify-json/lucide": "^1.2.136",
     "@nuxt/ui": "^4.11.2",
-    "@primal/shared": "*",
+    "@footix/shared": "*",
     "driver.js": "^1.8.0",
     "nuxt": "^4.5.2",
     "tailwindcss": "^4.3.3",

@@ -1,4 +1,4 @@
-import type { EventDto } from '@primal/shared'
+import type { EventDto } from '@footix/shared'
 import { driver } from 'driver.js'
 import 'driver.js/dist/driver.css'
 
@@ -44,13 +44,13 @@ export const useOnboardingTour = () => {
       nextBtnText: 'Suivant',
       prevBtnText: 'Précédent',
       doneBtnText: 'C’est parti',
-      popoverClass: 'primal-tour',
+      popoverClass: 'footix-tour',
       // Le créneau d'exemple n'est pas cliquable : ses boutons appelleraient l'API.
       disableActiveInteraction: true,
       onDestroyed: () => (demo.value = undefined),
       animate: !matchMedia('(prefers-reduced-motion: reduce)').matches,
       steps: [
-        { popover: { title: 'Bienvenue sur Primal', description: 'On te montre en trente secondes comment réserver ta place.' } },
+        { popover: { title: 'Bienvenue sur Footix', description: 'On te montre en trente secondes comment réserver ta place.' } },
         { element: '[data-tour="event"]', popover: { title: 'Les créneaux', description: 'Chaque match proposé s’affiche ici : date, lieu et places libres.' } },
         { element: '[data-tour="answer"]', popover: { title: 'Réponds au sondage', description: '« Je viens » réserve ta place, « Je ne viens pas » prévient les autres. Tu peux changer d’avis à tout moment.' } },
         { element: '[data-tour="pay"]', popover: { title: 'Paie ta place', description: 'Si le créneau a un lien de paiement, règle ta part avant le match.' } },

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { emailDomainSchema, type EmailDomainDto, type SaveEmailDomainDto } from '@primal/shared'
+import { emailDomainSchema, type EmailDomainDto, type SaveEmailDomainDto } from '@footix/shared'
 import type { FormFieldConfig } from '~/types/form'
 
 definePageMeta({ permission: 'email_domains.read' })
-useHead({ title: 'Domaines · Primal' })
+useHead({ title: 'Domaines · Footix' })
 
 const api = useApi()
 const toast = useToast()
@@ -46,13 +46,13 @@ async function remove(d: EmailDomainDto) {
 
 <template>
   <div>
-    <h1 class="font-display text-highlighted text-5xl font-black uppercase leading-none sm:text-6xl">Domaines</h1>
+    <h1 class="font-display text-highlighted text-4xl font-bold tracking-tight leading-[1.05] sm:text-5xl">Domaines</h1>
     <p class="text-muted mt-3">Seules les adresses de ces domaines peuvent créer un compte. Les comptes existants ne changent pas.</p>
 
     <div class="mt-10 grid gap-6 md:grid-cols-2">
       <UCard>
         <template #header>
-          <h2 class="font-display text-highlighted text-2xl font-bold uppercase">Autorisés</h2>
+          <h2 class="font-display text-highlighted text-lg font-bold tracking-tight">Autorisés</h2>
         </template>
         <ul v-if="domains.length" class="divide-default divide-y">
           <li v-for="d in domains" :key="d.id" class="flex items-center justify-between gap-3 py-2 first:pt-0 last:pb-0">
@@ -73,7 +73,7 @@ async function remove(d: EmailDomainDto) {
 
       <UCard v-if="canCreate">
         <template #header>
-          <h2 class="font-display text-highlighted text-2xl font-bold uppercase">Ajouter</h2>
+          <h2 class="font-display text-highlighted text-lg font-bold tracking-tight">Ajouter</h2>
         </template>
         <FormBuilder v-model:state="state" :schema="emailDomainSchema" :fields="fields" :submit="allow" submit-label="Autoriser le domaine" />
       </UCard>

@@ -6,14 +6,17 @@ export default defineNuxtConfig({
   ssr: false,
   app: {
     pageTransition: { name: 'page', mode: 'out-in' },
-    head: { link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }] },
+    head: {
+      link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
+      meta: [{ name: 'theme-color', content: '#2d4bff' }],
+    },
   },
   modules: ['@nuxt/ui'],
   css: ['~/assets/css/main.css'],
   fonts: {
     families: [
-      { name: 'Big Shoulders', provider: 'google', weights: [700, 900] },
-      { name: 'Archivo', provider: 'google', weights: [400, 500, 600] },
+      { name: 'Unbounded', provider: 'google', weights: [500, 700] },
+      { name: 'Geist', provider: 'google', weights: [400, 500, 600] },
     ],
   },
   runtimeConfig: {

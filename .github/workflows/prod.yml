@@ -23,12 +23,12 @@ jobs:
       postgres:
         image: postgres:latest
         env:
-          POSTGRES_USER: primal
-          POSTGRES_PASSWORD: primal
-          POSTGRES_DB: primal
-        options: --health-cmd "pg_isready -U primal" --health-interval 2s --health-retries 15
+          POSTGRES_USER: footix
+          POSTGRES_PASSWORD: footix
+          POSTGRES_DB: footix
+        options: --health-cmd "pg_isready -U footix" --health-interval 2s --health-retries 15
     env:
-      DATABASE_URL: postgres://primal:primal@postgres:5432/primal
+      DATABASE_URL: postgres://footix:footix@postgres:5432/footix
     steps:
       - uses: actions/checkout@v4
       - run: npm ci

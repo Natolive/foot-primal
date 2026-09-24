@@ -1,4 +1,4 @@
-import { PERMISSION_CATEGORIES, PERMISSION_LABELS } from '@primal/shared'
+import { PERMISSION_CATEGORIES, PERMISSION_LABELS } from '@footix/shared'
 
 // Droits groupés par catégorie, au format des champs `checkbox-group` de FormBuilder.
 export const permissionGroups = PERMISSION_CATEGORIES.map(({ label, permissions }) => ({

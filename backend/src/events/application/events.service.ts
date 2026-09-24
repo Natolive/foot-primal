@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { AnswerEventDto, EventDto, SaveEventDto } from '@primal/shared';
+import type { AnswerEventDto, EventDto, SaveEventDto } from '@footix/shared';
 import { BaseService } from '../../common/application/base.service.js';
 import { EventFullError, EventStartedError, TooFewPlacesError } from '../domain/errors.js';
 import { toEventDto, type Event, type NewEvent } from '../domain/event.entity.js';

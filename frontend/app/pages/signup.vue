@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { PASSWORD_MIN, signupSchema, type SignupDto } from '@primal/shared'
+import { PASSWORD_MIN, signupSchema, type SignupDto } from '@footix/shared'
 import type { FormFieldConfig } from '~/types/form'
 
 // Template à racine unique : requis par la transition de page.
 definePageMeta({ layout: 'auth', guest: true })
-useHead({ title: 'Créer un compte · Primal' })
+useHead({ title: 'Créer un compte · Footix' })
 
 const state = ref<SignupDto>({ lastName: '', firstName: '', email: '', password: '' })
 const fields: FormFieldConfig<SignupDto>[] = [
@@ -39,7 +39,7 @@ async function signup(data: SignupDto) {
 <template>
   <div>
     <div v-if="sentTo">
-      <h1 class="font-display text-highlighted text-5xl font-black uppercase leading-none">Vérifie tes mails</h1>
+      <h1 class="font-display text-highlighted text-3xl font-bold tracking-tight leading-[1.1] sm:text-4xl">Vérifie tes mails</h1>
       <p class="text-muted mt-3">
         On t'a envoyé un lien à <span class="text-highlighted font-medium">{{ sentTo }}</span> : ouvre-le pour activer ton compte.
         Rien reçu ? Regarde dans les spams, ou réinscris-toi pour recevoir un nouveau lien.
@@ -47,7 +47,7 @@ async function signup(data: SignupDto) {
       <UButton label="Recommencer l'inscription" variant="soft" icon="i-lucide-rotate-ccw" class="mt-8" @click="sentTo = undefined" />
     </div>
     <div v-else>
-      <h1 class="font-display text-highlighted text-5xl font-black uppercase leading-none">Créer un compte</h1>
+      <h1 class="font-display text-highlighted text-3xl font-bold tracking-tight leading-[1.1] sm:text-4xl">Créer un compte</h1>
       <p class="text-muted mt-3">Crée ton compte pour réserver ta place sur les prochains créneaux.</p>
 
       <FormBuilder v-model:state="state" :schema="signupSchema" :fields="fields" :submit="signup" submit-label="Créer mon compte" class="mt-10" />

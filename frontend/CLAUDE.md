@@ -3,11 +3,11 @@
 - Composant Nuxt UI (`U*`) d'abord, icônes `i-lucide-*`.
 - Composants rangés par dossier, fichier préfixé par le dossier (`form/FormBuilder.vue`).
 - Template de page à racine unique, sans commentaire HTML à côté (sinon la transition de page casse).
-- Formulaire = `FormBuilder` + schéma `@primal/shared`, jamais de `validate` à la main.
+- Formulaire = `FormBuilder` + schéma `@footix/shared`, jamais de `validate` à la main.
 - Couleurs via les tokens de `main.css` et les couleurs sémantiques Nuxt UI, jamais d'hexadécimal en composant.
-- Titres en `font-display` (Big Shoulders) majuscules, texte en Archivo.
+- Titres en `font-display` (Unbounded) en minuscules et `tracking-tight`, texte en Geist ; bleu `primary`, ballon `ball` décoratif seulement.
 - Mode clair et sombre, responsive dès 360 px.
-- Animation uniquement en réponse à une action, désactivée sous `prefers-reduced-motion`.
+- Animation uniquement en réponse à une action (seule exception : le ballon qui tombe sur le terrain de la page de connexion), désactivée sous `prefers-reduced-motion`.
 - Textes en français, tutoiement, bouton = verbe d'action repris dans le toast.
 - SPA (`ssr: false`) : pas de code qui suppose un rendu serveur.
 - Appels API via `useApi()` (cookie de session inclus), erreur affichée avec `apiErrorMessage(e)` dans un toast.

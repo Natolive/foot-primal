@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { EventDto, Permission } from '@primal/shared'
+import type { EventDto, Permission } from '@footix/shared'
 
 // Un créneau : infos, places restantes, réponses au sondage, et les boutons pour répondre.
 const props = defineProps<{ event: EventDto }>()
@@ -18,6 +18,8 @@ const taken = computed(() => props.event.participants.length)
 const coming = computed(() => props.event.participants.some((p) => p.id === user.value?.id))
 const declined = computed(() => props.event.declined.some((p) => p.id === user.value?.id))
 const full = computed(() => taken.value >= props.event.maxParticipants)
+// Rebond de « Je viens » seulement au clic, pas au chargement de la page.
+const kicked = ref(false)
 
 async function answer(attending: boolean) {
   let updated: EventDto
@@ -28,6 +30,7 @@ async function answer(attending: boolean) {
     return
   }
   emit('updated', updated)
+  kicked.value = attending
   toast.add({
     title: attending ? 'Tu viens, c’est noté' : 'Tu ne viens pas, c’est noté',
     description: attending ? `Rendez-vous ${when.value}, ${updated.location}.` : `Ta réponse à « ${updated.title} » est enregistrée.`,
@@ -42,7 +45,7 @@ async function answer(attending: boolean) {
     <div class="flex items-start justify-between gap-3">
       <div class="min-w-0">
         <p class="text-primary text-sm font-semibold first-letter:uppercase">{{ when }}</p>
-        <h2 class="font-display text-highlighted mt-1 text-3xl font-bold uppercase leading-none break-words">{{ event.title }}</h2>
+        <h2 class="font-display text-highlighted mt-1.5 text-2xl font-bold tracking-tight leading-tight break-words">{{ event.title }}</h2>
         <p class="text-muted mt-2 flex items-center gap-1.5 text-sm">
           <UIcon name="i-lucide-map-pin" class="shrink-0" />{{ event.location }}
         </p>
@@ -108,7 +111,9 @@ async function answer(attending: boolean) {
           size="lg"
           loading-auto
           class="justify-center font-semibold"
+          :class="{ kick: kicked }"
           @click="answer(true)"
+          @animationend="kicked = false"
         >
           Je viens
         </UButton>
@@ -128,3 +133,20 @@ async function answer(attending: boolean) {
     </div>
   </UCard>
 </template>
+
+<style scoped>
+.kick {
+  animation: kick .5s ease-out;
+}
+/* Appui, rebond, retour en place. */
+@keyframes kick {
+  0% { transform: scale(.92); }
+  45% { transform: scale(1.06); }
+  75% { transform: scale(.98); }
+  100% { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kick { animation: none; }
+}
+</style>

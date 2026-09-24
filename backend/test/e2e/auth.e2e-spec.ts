@@ -41,12 +41,12 @@ describe('Auth (e2e)', () => {
     await http.post('/auth/verify-email').send({ token: mailer.lastToken(), password: 'wrong-password' }).expect(401);
     const verified = await http.post('/auth/verify-email').send({ token: mailer.lastToken(), password: account.password });
     expect(verified.status).toBe(200);
-    expect(verified.headers['set-cookie']?.[0]).toMatch(/primal_session=.+HttpOnly/);
+    expect(verified.headers['set-cookie']?.[0]).toMatch(/footix_session=.+HttpOnly/);
     await http.post('/auth/signup').send(account).expect(409);
     await http.post('/auth/login').send({ email, password: 'wrong-password' }).expect(401);
 
     const login = await http.post('/auth/login').send({ email, password: account.password }).expect(200);
-    expect(login.headers['set-cookie']?.[0]).toMatch(/primal_session=.+HttpOnly/);
+    expect(login.headers['set-cookie']?.[0]).toMatch(/footix_session=.+HttpOnly/);
 
     const me = await http.get('/auth/me').expect(200);
     expect(me.body).toEqual({ id: expect.any(String), email, firstName: 'Léa', lastName: 'Dupont', role: 'user', onboarded: false, permissions: ['profile.read', 'profile.complete_onboarding', 'events.read', 'events.participate'] });

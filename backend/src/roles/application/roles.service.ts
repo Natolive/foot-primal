@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DEFAULT_ROLE_PERMISSIONS, PERMISSIONS, ROLES, type Permission, type Role, type RoleDto } from '@primal/shared';
+import { DEFAULT_ROLE_PERMISSIONS, PERMISSIONS, ROLES, type Permission, type Role, type RoleDto } from '@footix/shared';
 import { SuperAdminLockedError } from '../domain/errors.js';
 import { RolePermissionRepository } from '../domain/role-permission.repository.js';
 

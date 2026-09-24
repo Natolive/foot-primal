@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { eventSchema, type EventDto, type EventInput, type SaveEventDto } from '@primal/shared'
+import { eventSchema, type EventDto, type EventInput, type SaveEventDto } from '@footix/shared'
 import type { FormFieldConfig } from '~/types/form'
 
-useHead({ title: 'Créneaux · Primal' })
+useHead({ title: 'Créneaux · Footix' })
 const { demo } = useOnboardingTour()
 
 const api = useApi()
@@ -77,7 +77,7 @@ async function confirmDelete() {
   <div>
     <div class="flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h1 class="font-display text-highlighted text-5xl font-black uppercase leading-none sm:text-6xl">
+        <h1 class="font-display text-highlighted text-4xl font-bold tracking-tight leading-[1.05] sm:text-5xl">
           Salut {{ user?.firstName }}
         </h1>
         <p class="text-muted mt-3">Choisis tes prochains matchs et réserve ta place.</p>

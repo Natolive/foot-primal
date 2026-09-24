@@ -1,4 +1,4 @@
-import type { ManagedUserDto, Permission, Role } from '@primal/shared';
+import type { ManagedUserDto, Permission, Role } from '@footix/shared';
 
 export interface User {
   id: string;

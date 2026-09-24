@@ -1,4 +1,4 @@
-import { PERMISSIONS } from '@primal/shared';
+import { PERMISSIONS } from '@footix/shared';
 import { RolesService } from '@src/roles/application/roles.service.js';
 import { SuperAdminLockedError } from '@src/roles/domain/errors.js';
 import { InMemoryRolePermissionRepository } from '@test/fakes/in-memory-role-permission.repository.js';

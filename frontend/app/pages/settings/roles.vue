@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ROLE_LABELS, updateRoleSchema, type RoleDto, type UpdateRoleDto } from '@primal/shared'
+import { ROLE_LABELS, updateRoleSchema, type RoleDto, type UpdateRoleDto } from '@footix/shared'
 import type { FormFieldConfig } from '~/types/form'
 
 definePageMeta({ permission: 'roles.read' })
-useHead({ title: 'Droits · Primal' })
+useHead({ title: 'Droits · Footix' })
 
 const api = useApi()
 const toast = useToast()
@@ -31,13 +31,13 @@ async function save(role: RoleDto, data: UpdateRoleDto) {
 
 <template>
   <div>
-    <h1 class="font-display text-highlighted text-5xl font-black uppercase leading-none sm:text-6xl">Droits</h1>
+    <h1 class="font-display text-highlighted text-4xl font-bold tracking-tight leading-[1.05] sm:text-5xl">Droits</h1>
     <p class="text-muted mt-3">Choisis ce que chaque rôle peut faire.</p>
 
     <div class="mt-10 grid gap-6 md:grid-cols-2">
       <UCard v-for="role in roles" :key="role.role">
         <template #header>
-          <h2 class="font-display text-highlighted text-2xl font-bold uppercase">{{ ROLE_LABELS[role.role] }}</h2>
+          <h2 class="font-display text-highlighted text-lg font-bold tracking-tight">{{ ROLE_LABELS[role.role] }}</h2>
           <p v-if="!role.editable" class="text-muted mt-1 text-sm">À toujours tous les droits.</p>
         </template>
         <FormBuilder

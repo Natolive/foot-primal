@@ -11,7 +11,7 @@ import {
   type SignupDto,
   type UserDto,
   type VerifyEmailDto,
-} from '@primal/shared';
+} from '@footix/shared';
 import type { Request, Response } from 'express';
 import { RateLimit } from '../../../common/infrastructure/http/rate-limit.guard.js';
 import { ZodValidationPipe } from '../../../common/infrastructure/http/pipes/zod-validation.pipe.js';

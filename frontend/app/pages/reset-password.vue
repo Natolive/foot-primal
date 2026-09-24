@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { PASSWORD_MIN, resetPasswordSchema, type ResetPasswordDto } from '@primal/shared'
+import { PASSWORD_MIN, resetPasswordSchema, type ResetPasswordDto } from '@footix/shared'
 import type { FormFieldConfig } from '~/types/form'
 
 // Page ouverte depuis le lien « mot de passe oublié » (`?token=…`) ; template à racine unique (transition de page).
 definePageMeta({ layout: 'auth', guest: true })
-useHead({ title: 'Nouveau mot de passe · Primal' })
+useHead({ title: 'Nouveau mot de passe · Footix' })
 
 const route = useRoute()
 const state = ref<ResetPasswordDto>({ token: String(route.query.token ?? ''), password: '', remember: true })
@@ -30,7 +30,7 @@ async function save(data: ResetPasswordDto) {
 
 <template>
   <div>
-    <h1 class="font-display text-highlighted text-5xl font-black uppercase leading-none">Nouveau mot de passe</h1>
+    <h1 class="font-display text-highlighted text-3xl font-bold tracking-tight leading-[1.1] sm:text-4xl">Nouveau mot de passe</h1>
     <p class="text-muted mt-3">Choisis ton nouveau mot de passe, tu seras connecté dans la foulée.</p>
 
     <FormBuilder v-model:state="state" :schema="resetPasswordSchema" :fields="fields" :submit="save" submit-label="Changer le mot de passe" class="mt-10" />

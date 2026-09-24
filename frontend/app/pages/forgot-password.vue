@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { forgotPasswordSchema, type ForgotPasswordDto } from '@primal/shared'
+import { forgotPasswordSchema, type ForgotPasswordDto } from '@footix/shared'
 import type { FormFieldConfig } from '~/types/form'
 
 // Template à racine unique : requis par la transition de page.
 definePageMeta({ layout: 'auth', guest: true })
-useHead({ title: 'Mot de passe oublié · Primal' })
+useHead({ title: 'Mot de passe oublié · Footix' })
 
 const state = ref<ForgotPasswordDto>({ email: '' })
 const fields: FormFieldConfig<ForgotPasswordDto>[] = [
@@ -30,7 +30,7 @@ async function send(data: ForgotPasswordDto) {
 
 <template>
   <div>
-    <h1 class="font-display text-highlighted text-5xl font-black uppercase leading-none">Mot de passe oublié</h1>
+    <h1 class="font-display text-highlighted text-3xl font-bold tracking-tight leading-[1.1] sm:text-4xl">Mot de passe oublié</h1>
     <template v-if="sentTo">
       <p class="text-muted mt-3">
         Si un compte existe pour <span class="text-highlighted font-medium">{{ sentTo }}</span>, tu viens de recevoir un lien

@@ -8,7 +8,7 @@ import {
   type UpdateUserPermissionsDto,
   type UpdateUserRoleDto,
   type UserDto,
-} from '@primal/shared';
+} from '@footix/shared';
 import { Authorize, CurrentUser } from '../../../auth/infrastructure/http/session.guard.js';
 import { ZodValidationPipe } from '../../../common/infrastructure/http/pipes/zod-validation.pipe.js';
 import { UsersService } from '../../application/users.service.js';

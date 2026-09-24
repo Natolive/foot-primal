@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Put } from '@nestjs/common';
-import { ROLES, updateRoleSchema, type Role, type RoleDto, type UpdateRoleDto } from '@primal/shared';
+import { ROLES, updateRoleSchema, type Role, type RoleDto, type UpdateRoleDto } from '@footix/shared';
 import { z } from 'zod';
 import { Authorize } from '../../../auth/infrastructure/http/session.guard.js';
 import { ZodValidationPipe } from '../../../common/infrastructure/http/pipes/zod-validation.pipe.js';

@@ -4,7 +4,7 @@
 - `domain/` : entités, ports (classes abstraites) et erreurs métier, sans import Nest ni Drizzle.
 - Repository = port qui étend `BaseRepository` + adaptateur qui étend `DrizzleRepository`, liés dans le module (`{ provide: Port, useClass: Adapter }`).
 - Service CRUD = étend `BaseService` ; les services lèvent des erreurs métier (`NotFoundError`, `ConflictError`), jamais d'exception HTTP.
-- Controllers dans `infrastructure/http/`, body validé par `ZodValidationPipe` avec un schéma `@primal/shared`.
+- Controllers dans `infrastructure/http/`, body validé par `ZodValidationPipe` avec un schéma `@footix/shared`.
 - Route protégée = `@Authorize('<catégorie>.<action>')`, vérifié par le guard global `SessionGuard` (401 sans session, 403 sans droit) ; sans décorateur, la route est publique ; `@CurrentUser()` donne la personne connectée.
 - Email = template `src/mail/application/templates/<nom>.mail.ts` (cadre `layout()`, valeurs via `html\`\`` échappées), envoyé par `mailer.send(...)` avec `MailModule` importé ; jamais de HTML ni d'appel Brevo ailleurs.
 - Route publique qui envoie un email ou teste un mot de passe = `@RateLimit(...)` (par email et/ou par IP).

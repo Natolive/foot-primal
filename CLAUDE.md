@@ -1,4 +1,4 @@
-# Primal — règles projet
+# Footix — règles projet
 
 - Appli interne : s'inscrire aux créneaux de foot de l'entreprise, rien de plus sans demande.
 - Tout passe par Docker (`docker compose exec <backend|frontend> ...`), jamais `npm` sur l'hôte (Node trop ancien).

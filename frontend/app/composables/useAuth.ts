@@ -1,4 +1,4 @@
-import type { ForgotPasswordDto, LoginDto, ResetPasswordDto, UserDto, VerifyEmailDto } from '@primal/shared'
+import type { ForgotPasswordDto, LoginDto, ResetPasswordDto, UserDto, VerifyEmailDto } from '@footix/shared'
 
 export const useAuth = () => {
   // undefined : session pas encore vérifiée ; null : pas connecté.

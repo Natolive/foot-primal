@@ -1,5 +1,5 @@
 {
-  "name": "primal",
+  "name": "footix",
   "private": true,
   "workspaces": ["shared", "backend", "frontend"]
 }

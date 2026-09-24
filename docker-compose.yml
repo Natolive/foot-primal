@@ -30,15 +30,15 @@ services:
     image: postgres:latest
     environment:
       # Identifiants de dev en clair ; la prod les lit dans .env (docker-compose.prod.yml).
-      - POSTGRES_USER=primal
-      - POSTGRES_PASSWORD=primal
-      - POSTGRES_DB=primal
+      - POSTGRES_USER=footix
+      - POSTGRES_PASSWORD=footix
+      - POSTGRES_DB=footix
     ports:
       - "5432:5432"
     volumes:
       - db-data:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U primal -d primal"]
+      test: ["CMD-SHELL", "pg_isready -U footix -d footix"]
       interval: 2s
       timeout: 5s
       retries: 15
@@ -61,7 +61,7 @@ services:
         condition: service_started
     environment:
       - CORS_ORIGIN=http://footix.localhost
-      - DATABASE_URL=postgres://primal:primal@db:5432/primal
+      - DATABASE_URL=postgres://footix:footix@db:5432/footix
       - APP_URL=http://footix.localhost
       # Emails gardés par Mailpit, jamais envoyés : http://mail.footix.localhost
       - MAILPIT_URL=http://mailpit:8025

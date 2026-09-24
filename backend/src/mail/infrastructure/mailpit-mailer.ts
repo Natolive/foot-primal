@@ -10,7 +10,7 @@ export class MailpitMailer extends Mailer {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
-        From: { Name: 'Primal', Email: 'primal@footix.localhost' },
+        From: { Name: 'Footix', Email: 'noreply@footix.localhost' },
         To: [{ Name: to.name, Email: to.email }],
         Subject: subject,
         HTML: html,

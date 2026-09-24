@@ -1,5 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
-import { signupSchema } from '@primal/shared';
+import { signupSchema } from '@footix/shared';
 import { ZodValidationPipe } from '@src/common/infrastructure/http/pipes/zod-validation.pipe.js';
 
 describe('ZodValidationPipe', () => {

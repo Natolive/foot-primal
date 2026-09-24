@@ -15,9 +15,9 @@
     "outDir": "./dist",
     "rootDir": ".",
     "incremental": true,
-    // Garde @primal/shared vu depuis node_modules : tsc le vérifie sans le recompiler dans dist.
+    // Garde @footix/shared vu depuis node_modules : tsc le vérifie sans le recompiler dans dist.
     "preserveSymlinks": true,
-    // @primal/shared importe ses fichiers avec l'extension .ts (requis par Node).
+    // @footix/shared importe ses fichiers avec l'extension .ts (requis par Node).
     "rewriteRelativeImportExtensions": true,
     "skipLibCheck": true,
     "strict": true,

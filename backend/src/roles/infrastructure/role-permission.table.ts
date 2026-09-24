@@ -1,5 +1,5 @@
 import { boolean, pgTable, text, timestamp, unique, uuid } from 'drizzle-orm/pg-core';
-import type { Permission } from '@primal/shared';
+import type { Permission } from '@footix/shared';
 import { role } from '../../users/infrastructure/user.table.js';
 
 export const rolePermissions = pgTable(

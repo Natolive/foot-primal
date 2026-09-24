@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, ParseUUIDPipe, Post } from '@nestjs/common';
-import { emailDomainSchema, type EmailDomainDto, type SaveEmailDomainDto } from '@primal/shared';
+import { emailDomainSchema, type EmailDomainDto, type SaveEmailDomainDto } from '@footix/shared';
 import { Authorize } from '../../../auth/infrastructure/http/session.guard.js';
 import { ZodValidationPipe } from '../../../common/infrastructure/http/pipes/zod-validation.pipe.js';
 import { EmailDomainsService } from '../../application/email-domains.service.js';

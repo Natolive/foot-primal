@@ -6,7 +6,7 @@ import {
   type EventDto,
   type SaveEventDto,
   type UserDto,
-} from '@primal/shared';
+} from '@footix/shared';
 import { Authorize, CurrentUser } from '../../../auth/infrastructure/http/session.guard.js';
 import { ZodValidationPipe } from '../../../common/infrastructure/http/pipes/zod-validation.pipe.js';
 import { EventsService } from '../../application/events.service.js';

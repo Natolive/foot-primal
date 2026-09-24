@@ -1,7 +1,7 @@
 import type { CookieOptions, Request, Response } from 'express';
 import type { OpenedSession } from '../../application/auth.service.js';
 
-export const SESSION_COOKIE = 'primal_session';
+export const SESSION_COOKIE = 'footix_session';
 
 const baseOptions = (): CookieOptions => ({
   httpOnly: true,

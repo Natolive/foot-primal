@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { EmailDomainDto, SaveEmailDomainDto } from '@primal/shared';
+import type { EmailDomainDto, SaveEmailDomainDto } from '@footix/shared';
 import { BaseService } from '../../common/application/base.service.js';
 import type { EmailDomain, NewEmailDomain } from '../domain/email-domain.entity.js';
 import { EmailDomainRepository } from '../domain/email-domain.repository.js';

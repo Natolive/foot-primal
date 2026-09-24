@@ -2,29 +2,39 @@
 @import "@nuxt/ui";
 
 @theme static {
-  --font-sans: 'Archivo', sans-serif;
-  --font-display: 'Big Shoulders', sans-serif;
+  --font-sans: 'Geist', sans-serif;
+  --font-display: 'Unbounded', sans-serif;
 
-
-  --color-chalk: #eef3ec;
-
-  /* Couleurs de marque, reprises du « A » du logo. */
-  --color-primal-50: #f1efff;
-  --color-primal-100: #e4e0ff;
-  --color-primal-200: #cbc3ff;
-  --color-primal-300: #a797ff;
-  --color-primal-400: #8466ff;
-  --color-primal-500: #6a3dff;
-  --color-primal-600: #5a22f5;
-  --color-primal-700: #4b16d6;
-  --color-primal-800: #3e14ad;
-  --color-primal-900: #34148a;
-  --color-primal-950: #1f0a56;
-  --color-brand-violet: #8a00f5;
-  --color-brand-blue: #3b28f6;
-  --color-brand-teal: #00d6c4;
-  --color-ink: #0f1729;
+  /* Bleu Footix : couleur primaire (500 en clair, 400 en sombre, contrastes AA avec le blanc et le fond sombre). */
+  --color-footix-50: #eef2ff;
+  --color-footix-100: #dfe6ff;
+  --color-footix-200: #c5d0ff;
+  --color-footix-300: #9daeff;
+  --color-footix-400: #6680ff;
+  --color-footix-500: #2d4bff;
+  --color-footix-600: #2440e8;
+  --color-footix-700: #1f36c9;
+  --color-footix-800: #1e2fa0;
+  --color-footix-900: #1d2c7e;
+  --color-footix-950: #121a4a;
+  /* Le ballon : point du « i » du logo, uniquement décoratif (contraste trop faible pour du texte). */
+  --color-ball: #ff5a36;
+  /* Traits du terrain. */
+  --color-chalk: #ffffff;
 }
+
+/* Ambiance claire : page légèrement bleutée sous des cartes blanches ; en sombre, bleu marine plutôt que gris-noir. */
+body { background: #f8f9ff; }
+.dark {
+  --ui-bg: var(--color-footix-950);
+  --ui-bg-muted: #17215c;
+  --ui-bg-elevated: #1b276a;
+  --ui-bg-accented: #243285;
+  --ui-border: #243285;
+  --ui-border-muted: #1b276a;
+  --ui-border-accented: #2f3f9e;
+}
+.dark body { background: #0d1438; }
 
 /* Tailwind v4 ne met plus de main sur les boutons : on la remet partout où l'on peut cliquer. */
 @layer base {
@@ -42,41 +52,43 @@
 }
 
 /* Visite guidée (driver.js) aux couleurs de l'appli. */
-.driver-popover.primal-tour {
+.driver-popover.footix-tour {
   background: var(--ui-bg);
   color: var(--ui-text);
   border: 1px solid var(--ui-border);
   font-family: var(--font-sans);
 }
-.primal-tour .driver-popover-title {
+.footix-tour .driver-popover-title {
   font-family: var(--font-display);
-  text-transform: uppercase;
-  font-size: 1.5rem;
+  font-size: 1.125rem;
+  letter-spacing: -.01em;
   color: var(--ui-text-highlighted);
 }
-.primal-tour .driver-popover-description,
-.primal-tour .driver-popover-progress-text { color: var(--ui-text-muted); }
-.primal-tour .driver-popover-arrow { border-color: var(--ui-bg); }
-.primal-tour .driver-popover-footer button {
+.footix-tour .driver-popover-description,
+.footix-tour .driver-popover-progress-text { color: var(--ui-text-muted); }
+.footix-tour .driver-popover-arrow { border-color: var(--ui-bg); }
+.footix-tour .driver-popover-footer button {
   text-shadow: none;
   border-radius: var(--ui-radius);
   border-color: var(--ui-border);
   background: var(--ui-bg-elevated);
   color: var(--ui-text);
 }
-.primal-tour .driver-popover-next-btn {
+.footix-tour .driver-popover-next-btn {
   background: var(--ui-primary);
   border-color: var(--ui-primary);
   color: white;
 }
 
-/* Transition entre pages (le layout reste en place, seul le contenu glisse). */
-.page-enter-active,
-.page-leave-active {
-  transition: opacity .2s ease, transform .2s ease;
+/* Transition entre pages : le layout reste en place, le contenu monte légèrement en arrivant. */
+.page-enter-active {
+  transition: opacity .25s ease-out, transform .35s cubic-bezier(.2, .9, .3, 1.2);
 }
-.page-enter-from { opacity: 0; transform: translateX(16px); }
-.page-leave-to { opacity: 0; transform: translateX(-16px); }
+.page-leave-active {
+  transition: opacity .12s ease-in;
+}
+.page-enter-from { opacity: 0; transform: translateY(10px); }
+.page-leave-to { opacity: 0; }
 
 @media (prefers-reduced-motion: reduce) {
   .page-enter-active, .page-leave-active { transition: none; }

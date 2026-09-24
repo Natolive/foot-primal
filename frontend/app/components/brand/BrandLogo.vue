@@ -1,27 +1,38 @@
 <script setup lang="ts">
-// ponytail: redessiné d'après les PNG fournis, à remplacer par le SVG officiel s'il existe.
-// Lettres en currentColor (bleu nuit sur fond clair, blanc sur fond sombre), « A » en dégradé de marque.
-const id = useId()
+// Lettres en currentColor, le point du « i » est le ballon : il saute quand on survole le lien qui contient le logo.
 </script>
 
 <template>
-  <svg viewBox="0 0 905 97" role="img" aria-label="Primal" class="h-auto">
-    <defs>
-      <linearGradient :id="id" gradientUnits="userSpaceOnUse" x1="620" y1="92" x2="740" y2="60">
-        <stop offset="0" stop-color="#8a00f5" />
-        <stop offset=".5" stop-color="#3b28f6" />
-        <stop offset="1" stop-color="#00d6c4" />
-      </linearGradient>
-    </defs>
-    <g fill="none" stroke-width="10" stroke-linejoin="round">
-      <g stroke="currentColor">
-        <path d="M0 5 H88 Q108 5 108 26.5 Q108 48 88 48 H5 V92" />
-        <path d="M205 5 H293 Q313 5 313 26.5 Q313 48 293 48 H210 V92 M272 48 L313 92" />
-        <path d="M398 5 V92" />
-        <path d="M475 92 V8 L522 72 L569 8 V92" />
-        <path d="M825 5 V80 Q825 87 833 87 H905" />
-      </g>
-      <path :stroke="`url(#${id})`" d="M656 5 H684 L738 92 M676 55 H646 L623 92" />
+  <svg viewBox="-8 0 294 88" role="img" aria-label="Footix" class="h-auto overflow-visible">
+    <g fill="none" stroke="currentColor" stroke-width="13" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 80 V27 A19 19 0 0 1 27 8 H32 M-1 40 H29" />
+      <circle cx="68" cy="58" r="22" />
+      <circle cx="126" cy="58" r="22" />
+      <path d="M176 14 V64 A16 16 0 0 0 192 80 H196 M164 40 H194" />
+      <path d="M220 40 V80" />
+      <path d="M242 40 L278 80 M278 40 L242 80" />
     </g>
+    <circle cx="220" cy="13" r="9.5" class="ball fill-ball" />
   </svg>
 </template>
+
+<style scoped>
+.ball {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+a:hover .ball,
+a:focus-visible .ball {
+  animation: hop .6s cubic-bezier(.3, 0, .3, 1);
+}
+@keyframes hop {
+  0%, 100% { transform: translateY(0) scale(1); }
+  15% { transform: translateY(0) scale(1.15, .8); }
+  50% { transform: translateY(-45%) scale(.95, 1.05); }
+  85% { transform: translateY(0) scale(1.1, .85); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  a:hover .ball, a:focus-visible .ball { animation: none; }
+}
+</style>

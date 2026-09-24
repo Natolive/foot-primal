@@ -1,4 +1,4 @@
-import type { Permission } from '@primal/shared'
+import type { Permission } from '@footix/shared'
 
 declare module '#app' {
   interface PageMeta {

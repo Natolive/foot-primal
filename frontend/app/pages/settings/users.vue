@@ -12,11 +12,11 @@ import {
   type UpdateUserDto,
   type UpdateUserPermissionsDto,
   type UpdateUserRoleDto,
-} from '@primal/shared'
+} from '@footix/shared'
 import type { FormFieldConfig } from '~/types/form'
 
 definePageMeta({ permission: 'users.read' })
-useHead({ title: 'Utilisateurs · Primal' })
+useHead({ title: 'Utilisateurs · Footix' })
 
 const api = useApi()
 const toast = useToast()
@@ -97,7 +97,7 @@ async function save(path: string, method: 'PATCH' | 'PUT', body: object, title: 
 
 <template>
   <div>
-    <h1 class="font-display text-highlighted text-5xl font-black uppercase leading-none sm:text-6xl">Utilisateurs</h1>
+    <h1 class="font-display text-highlighted text-4xl font-bold tracking-tight leading-[1.05] sm:text-5xl">Utilisateurs</h1>
     <p class="text-muted mt-3">Modifie une personne, change son rôle ou ajoute-lui des droits.</p>
 
     <UTable :data="users" :columns="columns" class="mt-10">
@@ -138,7 +138,7 @@ async function save(path: string, method: 'PATCH' | 'PUT', body: object, title: 
       <template #body>
         <div v-if="editing" class="divide-default space-y-8 divide-y">
           <section v-if="sections(editing).profile" class="pb-8">
-            <h2 class="font-display text-highlighted mb-4 text-xl font-bold uppercase">Infos</h2>
+            <h2 class="font-display text-highlighted mb-4 text-base font-bold tracking-tight">Infos</h2>
             <FormBuilder
               v-model:state="profile"
               :schema="updateUserSchema"
@@ -148,7 +148,7 @@ async function save(path: string, method: 'PATCH' | 'PUT', body: object, title: 
             />
           </section>
           <section v-if="sections(editing).role" class="pb-8">
-            <h2 class="font-display text-highlighted mb-4 text-xl font-bold uppercase">Rôle</h2>
+            <h2 class="font-display text-highlighted mb-4 text-base font-bold tracking-tight">Rôle</h2>
             <FormBuilder
               v-model:state="role"
               :schema="updateUserRoleSchema"
@@ -158,7 +158,7 @@ async function save(path: string, method: 'PATCH' | 'PUT', body: object, title: 
             />
           </section>
           <section v-if="sections(editing).permissions" class="pb-8 last:pb-0">
-            <h2 class="font-display text-highlighted mb-4 text-xl font-bold uppercase">Droits en plus</h2>
+            <h2 class="font-display text-highlighted mb-4 text-base font-bold tracking-tight">Droits en plus</h2>
             <FormBuilder
               v-model:state="permissions"
               :schema="updateUserPermissionsSchema"

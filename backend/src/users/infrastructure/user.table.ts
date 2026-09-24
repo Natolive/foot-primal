@@ -1,4 +1,4 @@
-import { ROLES, type Permission } from '@primal/shared';
+import { ROLES, type Permission } from '@footix/shared';
 import { sql } from 'drizzle-orm';
 import { pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 

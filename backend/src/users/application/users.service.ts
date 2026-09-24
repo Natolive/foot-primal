@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { ManagedUserDto, UpdateUserDto, UpdateUserPermissionsDto, UpdateUserRoleDto } from '@primal/shared';
+import type { ManagedUserDto, UpdateUserDto, UpdateUserPermissionsDto, UpdateUserRoleDto } from '@footix/shared';
 import { BaseService } from '../../common/application/base.service.js';
 import { EmailAlreadyUsedError, OwnAccessLockedError, SuperAdminOnlyError } from '../domain/errors.js';
 import { toManagedUser, type NewUser, type PublicUser, type User } from '../domain/user.entity.js';

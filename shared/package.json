@@ -1,5 +1,5 @@
 {
-  "name": "@primal/shared",
+  "name": "@footix/shared",
   "private": true,
   "type": "module",
   "exports": {

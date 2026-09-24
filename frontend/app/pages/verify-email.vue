@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { verifyEmailSchema, type VerifyEmailDto } from '@primal/shared'
+import { verifyEmailSchema, type VerifyEmailDto } from '@footix/shared'
 import type { FormFieldConfig } from '~/types/form'
 
 // Page ouverte depuis le lien de l'email d'inscription (`?token=…`) ; template à racine unique (transition de page).
 definePageMeta({ layout: 'auth', guest: true })
-useHead({ title: 'Confirmer ton email · Primal' })
+useHead({ title: 'Confirmer ton email · Footix' })
 
 const route = useRoute()
 const state = ref<VerifyEmailDto>({ token: String(route.query.token ?? ''), password: '', remember: true })
@@ -23,14 +23,14 @@ async function confirm(data: VerifyEmailDto) {
     toast.add({ title: 'Confirmation impossible', description: apiErrorMessage(e), color: 'error', icon: 'i-lucide-circle-alert' })
     return
   }
-  toast.add({ title: 'Email confirmé', description: 'Bienvenue sur Primal.', color: 'success', icon: 'i-lucide-check' })
+  toast.add({ title: 'Email confirmé', description: 'Bienvenue sur Footix.', color: 'success', icon: 'i-lucide-check' })
   await navigateTo('/')
 }
 </script>
 
 <template>
   <div>
-    <h1 class="font-display text-highlighted text-5xl font-black uppercase leading-none">Confirmer ton email</h1>
+    <h1 class="font-display text-highlighted text-3xl font-bold tracking-tight leading-[1.1] sm:text-4xl">Confirmer ton email</h1>
     <p class="text-muted mt-3">Saisis ton mot de passe pour activer ton compte.</p>
 
     <FormBuilder v-model:state="state" :schema="verifyEmailSchema" :fields="fields" :submit="confirm" submit-label="Confirmer mon email" class="mt-10" />
