@@ -15,6 +15,13 @@
       "when": 1790258163323,
       "tag": "0001_create_email_domains",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790259120510,
+      "tag": "0002_add_group_email_domains",
+      "breakpoints": true
     }
   ]
 }
