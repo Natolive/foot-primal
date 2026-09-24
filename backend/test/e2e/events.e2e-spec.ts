@@ -60,6 +60,12 @@ describe('Events (e2e)', () => {
     const { body: declined } = await answer(orga, false).expect(200);
     expect(declined.declined).toEqual([expect.objectContaining({ firstName: 'Léa' })]);
     await answer(lea, true).expect(200);
+    await lea.post(`/events/${created.id}/guests`).send({ name: '' }).expect(400);
+    const { body: withGuest } = await lea.post(`/events/${created.id}/guests`).send({ name: 'Paul' }).expect(201);
+    expect(withGuest.guests).toEqual([expect.objectContaining({ name: 'Paul' })]);
+    await answer(max, true).expect(409);
+    await max.delete(`/events/${created.id}/guests/${withGuest.guests[0].id}`).expect(403);
+    await lea.delete(`/events/${created.id}/guests/${withGuest.guests[0].id}`).expect(200);
     await answer(max, true).expect(200);
     await orga.delete(`/events/${created.id}`).expect(204);
     await lea.get('/events').expect(200);

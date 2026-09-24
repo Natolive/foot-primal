@@ -27,3 +27,16 @@ export const eventParticipants = pgTable(
   },
   (t) => [primaryKey({ columns: [t.eventId, t.userId] })],
 );
+
+// Invités sans compte : supprimés avec le créneau ou avec la personne qui les ramène.
+export const eventGuests = pgTable('event_guests', {
+  id: uuid().primaryKey().defaultRandom(),
+  eventId: uuid('event_id')
+    .notNull()
+    .references(() => events.id, { onDelete: 'cascade' }),
+  invitedBy: uuid('invited_by')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  name: text().notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});

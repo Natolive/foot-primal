@@ -22,7 +22,7 @@ shared/     @footix/shared : schémas Zod + types (DTO) partagés front/back
   src/auth/     login, signup, verify-email, password-reset (.dto.ts)
   src/roles/    permissions.ts (droits, rôles, défauts), role.dto.ts
   src/users/    user.dto.ts, managed-user.dto.ts
-  src/events/   event.dto.ts (créneau, réponse au sondage)
+  src/events/   event.dto.ts (créneau, réponse au sondage, invité)
   src/email-domains/ email-domain.dto.ts (domaine autorisé à créer un compte)
 backend/    NestJS
   src/<domaine>/       auth, users, roles, events, email-domains ; architecture hexagonale :
@@ -35,7 +35,7 @@ backend/    NestJS
   drizzle/             migrations SQL (appliquées au démarrage)
 frontend/   Nuxt 4
   app/components/brand/  logo, élément graphique
-  app/components/event/  EventCard (créneau, places, réponses au sondage)
+  app/components/event/  EventCard (créneau, places, réponses au sondage, invités)
   app/components/form/   FormBuilder (formulaire généré depuis une liste de champs + schéma)
   app/composables/       useApi, useAuth, useOnboardingTour (visite guidée driver.js)
   app/layouts/           default (navbar), auth (bandeau de marque sur grand écran + formulaire)
@@ -56,7 +56,10 @@ Tests back : `docker compose exec backend npm test` (unitaires), `docker compose
 
 - Un organisateur crée un créneau : titre, date et heure, lieu, nombre de places, lien de paiement et infos facultatifs.
 - Chacun répond au sondage « je viens » / « je ne viens pas » jusqu'au début du match ; seuls les « je viens » prennent une place.
-- Rôles : `user` répond aux sondages, `admin` organise aussi les créneaux (catégorie de droits `planning`), `super_admin` a tout.
+- Qui vient peut ramener des invités sans compte (juste un nom, droit `events.invite_guest`) : chacun prend une place.
+  Répondre « je ne viens pas » retire ses invités ; on retire les siens, un organisateur (`planning.update_event`)
+  retire ceux de tout le monde. Plus d'ajout ni de retrait une fois le match commencé.
+- Rôles : `user` répond aux sondages et ramène des invités, `admin` organise aussi les créneaux (catégorie de droits `planning`), `super_admin` a tout.
   Premier super admin : `UPDATE users SET role = 'super_admin' WHERE email = '…'`.
 
 ## Emails
@@ -77,10 +80,10 @@ Tests back : `docker compose exec backend npm test` (unitaires), `docker compose
 - Se réinscrire avec un email pas encore confirmé remplace le compte et renvoie un lien (faute de frappe, lien perdu).
 - Mot de passe oublié : lien valable 1 h (`/reset-password?token=…`) ; le nouveau mot de passe déconnecte toutes les
   sessions, connecte, et confirme l'email si ce n'était pas fait. Même réponse que le compte existe ou non.
+- La liste des utilisateurs (`/settings/users`) montre si l'email est confirmé (`ManagedUserDto.emailVerified`).
 - Jetons des liens stockés hachés (SHA-256), à usage unique ; un nouveau lien remplace le précédent.
 - Limites par route (`@RateLimit`, en mémoire, 429 au-delà) :
 
-- La liste des utilisateurs (`/settings/users`) montre si l'email est confirmé (`ManagedUserDto.emailVerified`).
   | Route | Par email | Par IP |
   | --- | --- | --- |
   | `signup`, `forgot-password` | 3 / h | 30 / h |

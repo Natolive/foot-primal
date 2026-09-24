@@ -1,7 +1,9 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, ParseUUIDPipe, Post, Put } from '@nestjs/common';
 import {
+  addGuestSchema,
   answerEventSchema,
   eventSchema,
+  type AddGuestDto,
   type AnswerEventDto,
   type EventDto,
   type SaveEventDto,
@@ -52,5 +54,26 @@ export class EventsController {
     @Body(new ZodValidationPipe(answerEventSchema)) dto: AnswerEventDto,
   ): Promise<EventDto> {
     return this.events.answer(id, user.id, dto);
+  }
+
+  // Invité sans compte ramené par la personne connectée, qui doit venir elle-même.
+  @Post(':id/guests')
+  @Authorize('events.invite_guest')
+  addGuest(
+    @CurrentUser() user: UserDto,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body(new ZodValidationPipe(addGuestSchema)) dto: AddGuestDto,
+  ): Promise<EventDto> {
+    return this.events.addGuest(id, user.id, dto);
+  }
+
+  @Delete(':id/guests/:guestId')
+  @Authorize('events.invite_guest')
+  removeGuest(
+    @CurrentUser() user: UserDto,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('guestId', ParseUUIDPipe) guestId: string,
+  ): Promise<EventDto> {
+    return this.events.removeGuest(id, guestId, user);
   }
 }

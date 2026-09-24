@@ -49,7 +49,7 @@ describe('Auth (e2e)', () => {
     expect(login.headers['set-cookie']?.[0]).toMatch(/footix_session=.+HttpOnly/);
 
     const me = await http.get('/auth/me').expect(200);
-    expect(me.body).toEqual({ id: expect.any(String), email, firstName: 'Léa', lastName: 'Dupont', role: 'user', onboarded: false, permissions: ['profile.read', 'profile.complete_onboarding', 'events.read', 'events.participate'] });
+    expect(me.body).toEqual({ id: expect.any(String), email, firstName: 'Léa', lastName: 'Dupont', role: 'user', onboarded: false, permissions: ['profile.read', 'profile.complete_onboarding', 'events.read', 'events.participate', 'events.invite_guest'] });
 
     await http.post('/auth/me/onboarding').expect(204);
     expect((await http.get('/auth/me').expect(200)).body.onboarded).toBe(true);
@@ -59,7 +59,7 @@ describe('Auth (e2e)', () => {
 
     await db.update(users).set({ role: 'super_admin' }).where(eq(users.email, email));
     const roles = await http.get('/roles').expect(200);
-    expect(roles.body).toContainEqual({ role: 'user', permissions: ['profile.read', 'profile.complete_onboarding', 'events.read', 'events.participate'], editable: true });
+    expect(roles.body).toContainEqual({ role: 'user', permissions: ['profile.read', 'profile.complete_onboarding', 'events.read', 'events.participate', 'events.invite_guest'], editable: true });
     await http.put('/roles/super_admin').send({ permissions: [] }).expect(403);
     await http.put('/roles/user').send({ permissions: ['nope'] }).expect(400);
 

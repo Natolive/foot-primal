@@ -18,6 +18,7 @@ const demoEvent = (): EventDto => ({
     { id: 'demo-3', firstName: 'Inès', lastName: 'Petit' },
   ],
   declined: [{ id: 'demo-4', firstName: 'Lucas', lastName: 'Robert' }],
+  guests: [{ id: 'demo-5', name: 'Paul', invitedBy: { id: 'demo-2', firstName: 'Hugo', lastName: 'Bernard' } }],
 })
 
 export const useOnboardingTour = () => {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { EventDto, Permission } from '@footix/shared'
+import { addGuestSchema, type AddGuestDto, type EventDto, type GuestDto, type Permission } from '@footix/shared'
+import type { FormFieldConfig } from '~/types/form'
 
 // Un créneau : infos, places restantes, réponses au sondage, et les boutons pour répondre.
 const props = defineProps<{ event: EventDto }>()
@@ -14,12 +15,43 @@ const when = computed(() =>
   new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })
     .format(new Date(props.event.startsAt)),
 )
-const taken = computed(() => props.event.participants.length)
+// Invités et inscrits se partagent les places.
+const taken = computed(() => props.event.participants.length + props.event.guests.length)
 const coming = computed(() => props.event.participants.some((p) => p.id === user.value?.id))
 const declined = computed(() => props.event.declined.some((p) => p.id === user.value?.id))
 const full = computed(() => taken.value >= props.event.maxParticipants)
 // Rebond de « Je viens » seulement au clic, pas au chargement de la page.
 const kicked = ref(false)
+
+// Même règle que l'API : ses propres invités, ou tous avec le droit de modifier les créneaux.
+const removable = (g: GuestDto) => g.invitedBy.id === user.value?.id || can('planning.update_event')
+const guestFields: FormFieldConfig<AddGuestDto>[] = [{ name: 'name', label: 'Nom', placeholder: 'Paul' }]
+const guest = ref<AddGuestDto>()
+
+async function addGuest(data: AddGuestDto) {
+  let updated: EventDto
+  try {
+    updated = await api<EventDto>(`/events/${props.event.id}/guests`, { method: 'POST', body: data })
+  } catch (e) {
+    toast.add({ title: 'Ajout impossible', description: apiErrorMessage(e), color: 'error', icon: 'i-lucide-circle-alert' })
+    return
+  }
+  emit('updated', updated)
+  guest.value = undefined
+  toast.add({ title: 'Invité ajouté', description: `${data.name} a sa place pour « ${updated.title} ».`, color: 'success', icon: 'i-lucide-check' })
+}
+
+async function removeGuest(g: GuestDto) {
+  let updated: EventDto
+  try {
+    updated = await api<EventDto>(`/events/${props.event.id}/guests/${g.id}`, { method: 'DELETE' })
+  } catch (e) {
+    toast.add({ title: 'Retrait impossible', description: apiErrorMessage(e), color: 'error', icon: 'i-lucide-circle-alert' })
+    return
+  }
+  emit('updated', updated)
+  toast.add({ title: 'Invité retiré', description: `${g.name} libère sa place.`, color: 'success', icon: 'i-lucide-check' })
+}
 
 async function answer(attending: boolean) {
   let updated: EventDto
@@ -76,6 +108,25 @@ async function answer(attending: boolean) {
       >
         {{ p.firstName }} {{ p.lastName }}
       </UBadge>
+      <UBadge
+        v-for="g in event.guests"
+        :key="g.id"
+        :color="g.invitedBy.id === user?.id ? 'primary' : 'neutral'"
+        variant="outline"
+      >
+        {{ g.name }} <span class="text-dimmed">· invité de {{ g.invitedBy.firstName }}</span>
+        <UButton
+          v-if="removable(g)"
+          icon="i-lucide-x"
+          color="neutral"
+          variant="link"
+          size="xs"
+          class="-my-1 -mr-1 p-0"
+          :aria-label="`Retirer ${g.name}`"
+          loading-auto
+          @click="removeGuest(g)"
+        />
+      </UBadge>
     </div>
     <p v-else class="text-dimmed pt-5 text-sm">Personne pour l'instant, lance-toi.</p>
 
@@ -130,7 +181,36 @@ async function answer(attending: boolean) {
           Je ne viens pas
         </UButton>
       </div>
+      <UButton
+        v-if="coming && can('events.invite_guest')"
+        color="neutral"
+        variant="ghost"
+        icon="i-lucide-user-round-plus"
+        :disabled="full"
+        block
+        @click="guest = { name: '' }"
+      >
+        Ramener quelqu’un
+      </UButton>
     </div>
+
+    <UModal
+      :open="!!guest"
+      title="Ramener quelqu’un"
+      description="Ton invité n’a pas besoin de compte, il prend une place. Il part si tu ne viens plus."
+      @update:open="(open) => !open && (guest = undefined)"
+    >
+      <template #body>
+        <FormBuilder
+          v-if="guest"
+          v-model:state="guest"
+          :schema="addGuestSchema"
+          :fields="guestFields"
+          :submit="addGuest"
+          submit-label="Ajouter l’invité"
+        />
+      </template>
+    </UModal>
   </UCard>
 </template>
 

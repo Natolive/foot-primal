@@ -1,5 +1,11 @@
 import { EventsService } from '@src/events/application/events.service.js';
-import { EventFullError, EventStartedError, TooFewPlacesError } from '@src/events/domain/errors.js';
+import {
+  EventFullError,
+  EventStartedError,
+  NotAttendingError,
+  NotYourGuestError,
+  TooFewPlacesError,
+} from '@src/events/domain/errors.js';
 import { InMemoryEventRepository } from '@test/fakes/in-memory-event.repository.js';
 import { InMemoryUserRepository } from '@test/fakes/in-memory-user.repository.js';
 
@@ -33,8 +39,8 @@ describe('EventsService', () => {
     const soon = await events.createEvent(match(1));
     await events.answer(soon.id, lea.id, yes);
     expect(await events.findUpcoming()).toMatchObject([
-      { id: soon.id, participants: [{ id: lea.id, firstName: 'Léa', lastName: 'Dupont' }], declined: [] },
-      { id: later.id, participants: [], declined: [] },
+      { id: soon.id, participants: [{ id: lea.id, firstName: 'Léa', lastName: 'Dupont' }], declined: [], guests: [] },
+      { id: later.id, participants: [], declined: [], guests: [] },
     ]);
   });
 
@@ -68,5 +74,45 @@ describe('EventsService', () => {
     await events.answer(id, tom.id, no);
     await expect(events.updateEvent(id, match(1, 1))).rejects.toBeInstanceOf(TooFewPlacesError);
     expect(await events.updateEvent(id, { ...match(2, 2), location: 'Five' })).toMatchObject({ location: 'Five', maxParticipants: 2 });
+  });
+
+  describe('guests', () => {
+    it('takes a place, only for someone coming, and refuses when full', async () => {
+      const [lea, max] = await Promise.all(['Léa', 'Max'].map((n) => users.create(person(n))));
+      const { id } = await events.createEvent(match(1, 2));
+      await expect(events.addGuest(id, lea.id, { name: 'Paul' })).rejects.toBeInstanceOf(NotAttendingError);
+      await events.answer(id, lea.id, yes);
+      const event = await events.addGuest(id, lea.id, { name: 'Paul' });
+      expect(event.guests).toEqual([{ id: expect.any(String), name: 'Paul', invitedBy: { id: lea.id, firstName: 'Léa', lastName: 'Dupont' } }]);
+      await expect(events.answer(id, max.id, yes)).rejects.toBeInstanceOf(EventFullError);
+      await expect(events.addGuest(id, lea.id, { name: 'Tom' })).rejects.toBeInstanceOf(EventFullError);
+      await expect(events.updateEvent(id, match(1, 1))).rejects.toBeInstanceOf(TooFewPlacesError);
+    });
+
+    it('leaves with the person who brought them', async () => {
+      const lea = await users.create(person('Léa'));
+      const { id } = await events.createEvent(match(1, 4));
+      await events.answer(id, lea.id, yes);
+      await events.addGuest(id, lea.id, { name: 'Paul' });
+      expect((await events.answer(id, lea.id, no)).guests).toEqual([]);
+    });
+
+    it('is removed by the person who brought them or by an organiser only', async () => {
+      const [lea, max, orga] = await Promise.all(['Léa', 'Max', 'Orga'].map((n) => users.create(person(n))));
+      const { id } = await events.createEvent(match(1, 4));
+      await events.answer(id, lea.id, yes);
+      const [paul] = (await events.addGuest(id, lea.id, { name: 'Paul' })).guests;
+      const [, tom] = (await events.addGuest(id, lea.id, { name: 'Tom' })).guests;
+      await expect(events.removeGuest(id, paul.id, { id: max.id, permissions: [] })).rejects.toBeInstanceOf(NotYourGuestError);
+      await events.removeGuest(id, paul.id, { id: lea.id, permissions: [] });
+      const event = await events.removeGuest(id, tom.id, { id: orga.id, permissions: ['planning.update_event'] });
+      expect(event.guests).toEqual([]);
+    });
+
+    it('closes once the event has started', async () => {
+      const lea = await users.create(person('Léa'));
+      const past = await repository.create(match(-1));
+      await expect(events.addGuest(past.id, lea.id, { name: 'Paul' })).rejects.toBeInstanceOf(EventStartedError);
+    });
   });
 });

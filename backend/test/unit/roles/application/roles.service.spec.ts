@@ -11,13 +11,14 @@ describe('RolesService', () => {
   });
 
   it('gives user everything but administration, admin the events on top, super_admin everything', async () => {
-    expect(await roles.permissionsOf('user')).toEqual(['profile.read', 'profile.complete_onboarding', 'events.read', 'events.participate']);
+    expect(await roles.permissionsOf('user')).toEqual(['profile.read', 'profile.complete_onboarding', 'events.read', 'events.participate', 'events.invite_guest']);
     expect(await roles.permissionsOf('super_admin')).toEqual([...PERMISSIONS]);
     expect(await roles.permissionsOf('admin')).toEqual([
       'profile.read',
       'profile.complete_onboarding',
       'events.read',
       'events.participate',
+      'events.invite_guest',
       'planning.create_event',
       'planning.update_event',
       'planning.delete_event',

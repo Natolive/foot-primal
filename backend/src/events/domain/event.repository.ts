@@ -1,10 +1,15 @@
 import { BaseRepository } from '../../common/domain/base.repository.js';
-import type { Event, NewEvent, Participant } from './event.entity.js';
+import type { Event, Guest, NewEvent, Participant } from './event.entity.js';
 
 export abstract class EventRepository extends BaseRepository<Event, NewEvent> {
   // Créneaux pas encore commencés, du plus proche au plus lointain.
   abstract findUpcoming(now: Date): Promise<Event[]>;
   abstract findParticipants(eventIds: string[]): Promise<Participant[]>;
+  abstract findGuests(eventIds: string[]): Promise<Guest[]>;
   // Enregistre ou change la réponse ; « je viens » seulement s'il reste une place (false si complet).
+  // Invités et inscrits se partagent les places ; « je ne viens pas » retire aussi les invités de la personne.
   abstract answer(eventId: string, userId: string, attending: boolean): Promise<boolean>;
+  // Ajoute l'invité seulement si la personne qui le ramène vient et qu'il reste une place.
+  abstract addGuest(eventId: string, invitedBy: string, name: string): Promise<'added' | 'not_attending' | 'full'>;
+  abstract removeGuest(guestId: string): Promise<void>;
 }

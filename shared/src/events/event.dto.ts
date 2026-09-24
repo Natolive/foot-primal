@@ -6,6 +6,13 @@ export interface ParticipantDto {
   lastName: string
 }
 
+// Personne sans compte ramenée par un inscrit : elle prend une place.
+export interface GuestDto {
+  id: string
+  name: string
+  invitedBy: ParticipantDto
+}
+
 // Créneau tel que renvoyé par l'API, avec les réponses au sondage (visibles par tous).
 export interface EventDto {
   id: string
@@ -19,6 +26,7 @@ export interface EventDto {
   participants: ParticipantDto[]
   // Ceux qui ont répondu « je ne viens pas ».
   declined: ParticipantDto[]
+  guests: GuestDto[]
 }
 
 // Champ facultatif : vide, absent ou null devient null en base.
@@ -47,3 +55,9 @@ export const answerEventSchema = z.object({
   attending: z.boolean('Réponds « je viens » ou « je ne viens pas ».'),
 })
 export type AnswerEventDto = z.infer<typeof answerEventSchema>
+
+// Invité : juste un nom, il n'a pas de compte.
+export const addGuestSchema = z.object({
+  name: z.string('Indique le nom de ton invité.').trim().min(1, 'Indique le nom de ton invité, par exemple « Paul ».').max(60, 'Raccourcis le nom à 60 caractères.'),
+})
+export type AddGuestDto = z.infer<typeof addGuestSchema>
