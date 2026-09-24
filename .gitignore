@@ -3,3 +3,4 @@ dist
 .nuxt
 .output
 .env
+*.tsbuildinfo
