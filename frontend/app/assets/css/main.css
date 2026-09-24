@@ -23,16 +23,32 @@
   --color-chalk: #ffffff;
 }
 
-/* Ambiance claire : page légèrement bleutée sous des cartes blanches ; en sombre, bleu marine plutôt que gris-noir. */
-body { background: #f8f9ff; }
+/* Contraste renforcé : chaque niveau de texte un cran plus foncé que Nuxt UI (le plus pâle reste AA sur blanc),
+   bordures plus marquées, page bleutée franche sous des cartes blanches. */
+:root {
+  --ui-text-dimmed: var(--ui-color-neutral-500);
+  --ui-text-muted: var(--ui-color-neutral-600);
+  --ui-text-toned: var(--ui-color-neutral-700);
+  --ui-text: var(--ui-color-neutral-800);
+  --ui-text-highlighted: var(--ui-color-neutral-950);
+  --ui-border: var(--ui-color-neutral-300);
+  --ui-border-accented: var(--ui-color-neutral-400);
+}
+body { background: var(--color-footix-100); }
+/* En sombre, bleu marine plutôt que gris-noir, textes un cran plus clairs. */
 .dark {
+  --ui-text-dimmed: var(--ui-color-neutral-400);
+  --ui-text-muted: var(--ui-color-neutral-300);
+  --ui-text-toned: var(--ui-color-neutral-200);
+  --ui-text: var(--ui-color-neutral-100);
+  --ui-text-highlighted: white;
   --ui-bg: var(--color-footix-950);
   --ui-bg-muted: #17215c;
   --ui-bg-elevated: #1b276a;
   --ui-bg-accented: #243285;
-  --ui-border: #243285;
+  --ui-border: #34469f;
   --ui-border-muted: #1b276a;
-  --ui-border-accented: #2f3f9e;
+  --ui-border-accented: #4458c0;
 }
 .dark body { background: #0d1438; }
 
