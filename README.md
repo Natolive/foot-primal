@@ -80,6 +80,7 @@ Tests back : `docker compose exec backend npm test` (unitaires), `docker compose
 - Jetons des liens stockés hachés (SHA-256), à usage unique ; un nouveau lien remplace le précédent.
 - Limites par route (`@RateLimit`, en mémoire, 429 au-delà) :
 
+- La liste des utilisateurs (`/settings/users`) montre si l'email est confirmé (`ManagedUserDto.emailVerified`).
   | Route | Par email | Par IP |
   | --- | --- | --- |
   | `signup`, `forgot-password` | 3 / h | 30 / h |

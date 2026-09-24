@@ -10,6 +10,7 @@ export interface ManagedUserDto {
   lastName: string
   role: Role
   extraPermissions: Permission[]
+  emailVerified: boolean
 }
 
 // Un schéma par droit : chacun se modifie séparément.

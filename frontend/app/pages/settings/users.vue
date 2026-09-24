@@ -29,6 +29,7 @@ const { data: users } = await useAsyncData('users', () => api<ManagedUserDto[]>(
 const columns: TableColumn<ManagedUserDto>[] = [
   { id: 'name', header: 'Nom' },
   { accessorKey: 'email', header: 'Email' },
+  { accessorKey: 'emailVerified', header: 'Email confirmé' },
   { accessorKey: 'role', header: 'Rôle' },
   { accessorKey: 'extraPermissions', header: 'Droits en plus' },
   { id: 'actions' },
@@ -103,6 +104,10 @@ async function save(path: string, method: 'PATCH' | 'PUT', body: object, title: 
     <UTable :data="users" :columns="columns" class="mt-10">
       <template #name-cell="{ row }">
         <span class="text-highlighted font-medium">{{ row.original.firstName }} {{ row.original.lastName }}</span>
+      </template>
+      <template #emailVerified-cell="{ row }">
+        <UBadge v-if="row.original.emailVerified" color="success" variant="subtle" icon="i-lucide-check">Confirmé</UBadge>
+        <UBadge v-else color="warning" variant="subtle" icon="i-lucide-clock">En attente</UBadge>
       </template>
       <template #role-cell="{ row }">
         <UBadge :color="row.original.role === 'super_admin' ? 'primary' : 'neutral'" variant="subtle">

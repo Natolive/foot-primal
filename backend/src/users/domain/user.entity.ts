@@ -43,4 +43,5 @@ export const toPublicUser = ({ id, email, firstName, lastName, role }: User): Pu
 export const toManagedUser = (user: User): ManagedUserDto => ({
   ...toPublicUser(user),
   extraPermissions: user.extraPermissions,
+  emailVerified: !!user.emailVerifiedAt,
 });
