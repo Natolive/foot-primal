@@ -2,7 +2,7 @@
 # Variables lues dans .env (voir .env.example) ; IMAGE_TAG = commit à déployer, `latest` par défaut.
 # HTTPS assuré par le reverse proxy du serveur (Caddy) vers 127.0.0.1:${PORT} ; l'API est servie par le front sous /api.
 x-app: &app
-  image: ghcr.io/natolive/foot-primal:${IMAGE_TAG:-latest}
+  image: ghcr.io/natolive/footix:${IMAGE_TAG:-latest}
   restart: unless-stopped
 
 services:

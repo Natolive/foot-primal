@@ -23,7 +23,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       - traefik.enable=true
-      - traefik.http.routers.dashboard.rule=Host(`traefik.foot-primal.localhost`)
+      - traefik.http.routers.dashboard.rule=Host(`traefik.footix.localhost`)
       - traefik.http.routers.dashboard.service=api@internal
 
   db:
@@ -47,7 +47,7 @@ services:
     image: axllent/mailpit:latest
     labels:
       - traefik.enable=true
-      - traefik.http.routers.mailpit.rule=Host(`mail.foot-primal.localhost`)
+      - traefik.http.routers.mailpit.rule=Host(`mail.footix.localhost`)
       - traefik.http.services.mailpit.loadbalancer.server.port=8025
 
   backend:
@@ -60,14 +60,14 @@ services:
       mailpit:
         condition: service_started
     environment:
-      - CORS_ORIGIN=http://foot-primal.localhost
+      - CORS_ORIGIN=http://footix.localhost
       - DATABASE_URL=postgres://primal:primal@db:5432/primal
-      - APP_URL=http://foot-primal.localhost
-      # Emails gardés par Mailpit, jamais envoyés : http://mail.foot-primal.localhost
+      - APP_URL=http://footix.localhost
+      # Emails gardés par Mailpit, jamais envoyés : http://mail.footix.localhost
       - MAILPIT_URL=http://mailpit:8025
     labels:
       - traefik.enable=true
-      - traefik.http.routers.backend.rule=Host(`api.foot-primal.localhost`)
+      - traefik.http.routers.backend.rule=Host(`api.footix.localhost`)
       - traefik.http.services.backend.loadbalancer.server.port=3000
 
   frontend:
@@ -75,10 +75,10 @@ services:
     working_dir: /repo/frontend
     command: npm run dev -- --host 0.0.0.0
     environment:
-      - NUXT_PUBLIC_API_URL=http://api.foot-primal.localhost
+      - NUXT_PUBLIC_API_URL=http://api.footix.localhost
     labels:
       - traefik.enable=true
-      - traefik.http.routers.frontend.rule=Host(`foot-primal.localhost`)
+      - traefik.http.routers.frontend.rule=Host(`footix.localhost`)
       - traefik.http.services.frontend.loadbalancer.server.port=3000
 
 volumes:

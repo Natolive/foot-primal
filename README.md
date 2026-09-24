@@ -6,10 +6,10 @@ Appli pour s'inscrire aux créneaux de foot proposés par la boîte.
 docker compose up --build
 ```
 
-- http://foot-primal.localhost — front Nuxt 4 (Nuxt UI)
-- http://api.foot-primal.localhost — API NestJS
-- http://mail.foot-primal.localhost — Mailpit : emails envoyés en dev (jamais vraiment envoyés)
-- http://traefik.foot-primal.localhost — dashboard Traefik
+- http://footix.localhost — front Nuxt 4 (Nuxt UI)
+- http://api.footix.localhost — API NestJS
+- http://mail.footix.localhost — Mailpit : emails envoyés en dev (jamais vraiment envoyés)
+- http://traefik.footix.localhost — dashboard Traefik
 - PostgreSQL : `localhost:5432`, base/utilisateur/mot de passe `primal` (dev)
 
 ## Structure
@@ -65,7 +65,7 @@ Tests back : `docker compose exec backend npm test` (unitaires), `docker compose
 - Un email = un template `src/mail/application/templates/<nom>.mail.ts` qui renvoie `{ to, subject, html }`
   dans le cadre commun `layout()` ; valeurs insérées via `html\`\`` (échappées automatiquement).
   Envoi : `mailer.send(monMail(...))`, avec `MailModule` importé dans le module.
-- Dev : les emails arrivent dans Mailpit (http://mail.foot-primal.localhost), rien ne part vraiment.
+- Dev : les emails arrivent dans Mailpit (http://mail.footix.localhost), rien ne part vraiment.
   Sans Mailpit ni `BREVO_API_KEY` (CI), l'email s'affiche dans les logs du back.
 
 ## Comptes
@@ -103,13 +103,13 @@ URL : https://foot.benit.ooo, API sous https://foot.benit.ooo/api (relayée par 
 HTTPS assuré par Caddy sur le serveur (`/etc/caddy/Caddyfile` : `foot.benit.ooo { reverse_proxy 127.0.0.1:3001 }`).
 
 À chaque push sur `main`, `.github/workflows/prod.yml` lance les tests, publie l'image sur
-`ghcr.io/natolive/foot-primal` (tags `latest` et commit), copie `docker-compose.prod.yml` sur le serveur puis y fait
-`docker compose pull && up -d`. Le serveur ne contient que `~/foot-primal/{docker-compose.prod.yml,.env}` : ni code, ni build.
+`ghcr.io/natolive/footix` (tags `latest` et commit), copie `docker-compose.prod.yml` sur le serveur puis y fait
+`docker compose pull && up -d`. Le serveur ne contient que `~/footix/{docker-compose.prod.yml,.env}` : ni code, ni build.
 Migrations appliquées au démarrage de l'API, base et API non exposées.
 
 Mise en place, une fois :
 
-1. Serveur : Docker installé, `mkdir ~/foot-primal` et y créer `.env` depuis `.env.example`.
+1. Serveur : Docker installé, `mkdir ~/footix` et y créer `.env` depuis `.env.example`.
 2. Clé SSH de la CI : `ssh-keygen -t ed25519 -f primal-ci -N ''`, ajouter `primal-ci.pub`
    à `~/.ssh/authorized_keys` du serveur.
 3. GitHub → Settings → Environments → `production`, secrets :

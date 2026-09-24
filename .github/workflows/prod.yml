@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  IMAGE: ghcr.io/natolive/foot-primal
+  IMAGE: ghcr.io/natolive/footix
 
 jobs:
   test:
@@ -82,14 +82,14 @@ jobs:
           install -m 700 -d ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
           echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
-          scp docker-compose.prod.yml "$SSH_TARGET":foot-primal/
+          scp docker-compose.prod.yml "$SSH_TARGET":footix/
           # Jeton du job, clé et expéditeur Brevo passés sur l'entrée standard : jamais en ligne de commande ni dans les logs.
           # Le serveur n'a aucun identifiant GitHub à garder ; BREVO_API_KEY (secret) et MAIL_FROM (variable) de
           # l'environnement GitHub font référence et sont recopiés dans son .env.
           printf '%s\n%s\n%s\n' "$GHCR_TOKEN" "$BREVO_API_KEY" "$MAIL_FROM" | ssh "$SSH_TARGET" "read -r GHCR_TOKEN \
             && read -r BREVO_API_KEY && read -r MAIL_FROM \
             && test -n \"\$BREVO_API_KEY\" && test -n \"\$MAIL_FROM\" \
-            && cd ~/foot-primal \
+            && cd ~/footix \
             && (umask 077; grep -Ev '^(BREVO_API_KEY|MAIL_FROM)=' .env > .env.new; \
               printf 'BREVO_API_KEY=%s\nMAIL_FROM=%s\n' \"\$BREVO_API_KEY\" \"\$MAIL_FROM\" >> .env.new) \
             && mv .env.new .env \
