@@ -1,1 +1,0 @@
-ALTER TABLE "users" ADD COLUMN "extra_permissions" text[] DEFAULT '{}' NOT NULL;
