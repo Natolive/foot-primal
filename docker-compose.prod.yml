@@ -1,0 +1,73 @@
+# Production : docker compose -f docker-compose.prod.yml up -d --build
+# Variables lues dans .env (voir .env.example).
+x-app: &app
+  build: { context: ., target: prod }
+  image: foot-primal
+  restart: unless-stopped
+
+services:
+  traefik:
+    image: traefik:latest
+    restart: unless-stopped
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.websecure.http.tls.certresolver=le
+      - --certificatesresolvers.le.acme.email=${ACME_EMAIL:?}
+      - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.le.acme.httpchallenge.entrypoint=web
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - letsencrypt:/letsencrypt
+
+  db:
+    image: postgres:latest
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=primal
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?}
+      - POSTGRES_DB=primal
+    volumes:
+      - db-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U primal -d primal"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
+  backend:
+    <<: *app
+    working_dir: /repo/backend
+    command: sh -c "npm run db:migrate && npm run start:prod"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - CORS_ORIGIN=https://${DOMAIN:?}
+      - COOKIE_SECURE=true
+      - DATABASE_URL=postgres://primal:${POSTGRES_PASSWORD}@db:5432/primal
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.backend.rule=Host(`api.${DOMAIN}`)
+      - traefik.http.services.backend.loadbalancer.server.port=3000
+
+  frontend:
+    <<: *app
+    working_dir: /repo/frontend
+    command: node .output/server/index.mjs
+    environment:
+      - NUXT_PUBLIC_API_URL=https://api.${DOMAIN}
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.frontend.rule=Host(`${DOMAIN}`)
+      - traefik.http.services.frontend.loadbalancer.server.port=3000
+
+volumes:
+  db-data:
+  letsencrypt:

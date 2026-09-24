@@ -1,6 +1,6 @@
 # Une seule image pour l'espace de travail npm (shared + backend + frontend).
 x-app: &app
-  build: .
+  build: { context: ., target: dev }
   volumes:
     - .:/repo
     - /repo/node_modules
@@ -27,7 +27,7 @@ services:
   db:
     image: postgres:latest
     environment:
-      # ponytail: identifiants de dev en clair, passer par des secrets avant tout déploiement.
+      # Identifiants de dev en clair ; la prod les lit dans .env (docker-compose.prod.yml).
       - POSTGRES_USER=primal
       - POSTGRES_PASSWORD=primal
       - POSTGRES_DB=primal

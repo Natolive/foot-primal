@@ -52,3 +52,15 @@ Tests back : `docker compose exec backend npm test` (unitaires), `docker compose
 - Chacun répond au sondage « je viens » / « je ne viens pas » jusqu'au début du match ; seuls les « je viens » prennent une place.
 - Rôles : `user` répond aux sondages, `admin` organise aussi les créneaux (catégorie de droits `planning`), `super_admin` a tout.
   Premier super admin : `UPDATE users SET role = 'super_admin' WHERE email = '…'`.
+
+## Production
+
+Sur le serveur (ports 80 et 443 ouverts, `DOMAIN` et `api.DOMAIN` pointant vers lui) :
+
+```bash
+cp .env.example .env   # remplir DOMAIN, ACME_EMAIL, POSTGRES_PASSWORD
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+HTTPS via Let's Encrypt (Traefik), migrations appliquées au démarrage de l'API, base non exposée.
+Mise à jour : `git pull` puis la même commande.
