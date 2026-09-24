@@ -77,17 +77,21 @@ jobs:
           SSH_TARGET: ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          MAIL_FROM: ${{ vars.MAIL_FROM }}
         run: |
           install -m 700 -d ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
           echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
           scp docker-compose.prod.yml "$SSH_TARGET":foot-primal/
-          # Jeton du job et clé Brevo passés sur l'entrée standard : jamais en ligne de commande ni dans les logs.
-          # Le serveur n'a aucun identifiant GitHub à garder ; la clé Brevo est recopiée dans son .env (secret GitHub = référence).
-          printf '%s\n%s\n' "$GHCR_TOKEN" "$BREVO_API_KEY" | ssh "$SSH_TARGET" "read -r GHCR_TOKEN && read -r BREVO_API_KEY \
-            && test -n \"\$BREVO_API_KEY\" \
+          # Jeton du job, clé et expéditeur Brevo passés sur l'entrée standard : jamais en ligne de commande ni dans les logs.
+          # Le serveur n'a aucun identifiant GitHub à garder ; BREVO_API_KEY (secret) et MAIL_FROM (variable) de
+          # l'environnement GitHub font référence et sont recopiés dans son .env.
+          printf '%s\n%s\n%s\n' "$GHCR_TOKEN" "$BREVO_API_KEY" "$MAIL_FROM" | ssh "$SSH_TARGET" "read -r GHCR_TOKEN \
+            && read -r BREVO_API_KEY && read -r MAIL_FROM \
+            && test -n \"\$BREVO_API_KEY\" && test -n \"\$MAIL_FROM\" \
             && cd ~/foot-primal \
-            && (umask 077; grep -v '^BREVO_API_KEY=' .env > .env.new; echo \"BREVO_API_KEY=\$BREVO_API_KEY\" >> .env.new) \
+            && (umask 077; grep -Ev '^(BREVO_API_KEY|MAIL_FROM)=' .env > .env.new; \
+              printf 'BREVO_API_KEY=%s\nMAIL_FROM=%s\n' \"\$BREVO_API_KEY\" \"\$MAIL_FROM\" >> .env.new) \
             && mv .env.new .env \
             && echo \"\$GHCR_TOKEN\" | docker login ghcr.io -u ${{ github.actor }} --password-stdin \
             && export IMAGE_TAG=${{ github.sha }} \

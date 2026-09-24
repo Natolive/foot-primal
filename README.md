@@ -114,8 +114,9 @@ Mise en place, une fois :
    à `~/.ssh/authorized_keys` du serveur.
 3. GitHub → Settings → Environments → `production`, secrets :
    `SSH_HOST`, `SSH_USER`, `SSH_PRIVATE_KEY` (contenu de `primal-ci`), `SSH_KNOWN_HOSTS` (sortie de `ssh-keyscan <hôte>`),
-   `BREVO_API_KEY` (clé API v3 `xkeysib-…`, recopiée dans le `.env` du serveur à chaque déploiement) :
-   `gh secret set BREVO_API_KEY --env production`.
+   `BREVO_API_KEY` (clé API v3 `xkeysib-…`) : `gh secret set BREVO_API_KEY --env production` ;
+   variable `MAIL_FROM` : `gh variable set MAIL_FROM --env production --body noreply@noreply.benit.ooo`.
+   Les deux sont recopiés dans le `.env` du serveur à chaque déploiement.
    Brevo : expéditeur `noreply@noreply.benit.ooo` et domaine `noreply.benit.ooo` authentifiés (DNS).
 4. Premier push sur `main`, puis créer son compte et passer super admin :
    `docker compose -f docker-compose.prod.yml exec db psql -U primal -c "UPDATE users SET role = 'super_admin' WHERE email = '…'"`.

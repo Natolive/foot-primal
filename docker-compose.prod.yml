@@ -33,9 +33,9 @@ services:
       - COOKIE_SECURE=true
       - DATABASE_URL=postgres://primal:${POSTGRES_PASSWORD}@db:5432/primal
       - APP_URL=https://${DOMAIN}
-      # Recopiée dans .env par la CI depuis le secret GitHub BREVO_API_KEY.
+      # Recopiés dans .env par la CI depuis l'environnement GitHub `production` (secret et variable du même nom).
       - BREVO_API_KEY=${BREVO_API_KEY:?}
-      - MAIL_FROM=noreply@noreply.benit.ooo
+      - MAIL_FROM=${MAIL_FROM:?}
 
   frontend:
     <<: *app
