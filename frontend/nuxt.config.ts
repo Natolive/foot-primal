@@ -19,4 +19,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: { apiUrl: '' },
   },
+  // Prod : l'API passe par le front (/api), un seul domaine derrière le reverse proxy du serveur.
+  $production: {
+    routeRules: { '/api/**': { proxy: 'http://backend:3000/**' } },
+  },
 })

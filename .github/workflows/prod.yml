@@ -1,0 +1,90 @@
+# Push sur main : tests, image publiée sur ghcr.io, puis déploiement sur le serveur de prod.
+# Secrets à créer dans l'environnement GitHub « production » : voir README, section Production.
+name: Prod
+
+on:
+  push:
+    branches: [main]
+
+# Un seul déploiement à la fois ; un push plus récent annule celui en attente.
+concurrency:
+  group: prod
+  cancel-in-progress: true
+
+env:
+  IMAGE: ghcr.io/natolive/foot-primal
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    # Même image que le Dockerfile.
+    container: node:alpine
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: primal
+          POSTGRES_PASSWORD: primal
+          POSTGRES_DB: primal
+        options: --health-cmd "pg_isready -U primal" --health-interval 2s --health-retries 15
+    env:
+      DATABASE_URL: postgres://primal:primal@postgres:5432/primal
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm run db:migrate -w backend
+      - run: npm test -w backend
+      - run: npm run test:e2e -w backend
+
+  image:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      # Tag du commit pour revenir en arrière, `latest` pour le serveur.
+      - uses: docker/build-push-action@v6
+        with:
+          target: prod
+          push: true
+          tags: ${{ env.IMAGE }}:${{ github.sha }},${{ env.IMAGE }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: image
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: docker-compose.prod.yml
+          sparse-checkout-cone-mode: false
+      - name: Déployer sur le serveur
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+          SSH_TARGET: ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          install -m 700 -d ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+          echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          scp docker-compose.prod.yml "$SSH_TARGET":foot-primal/
+          # Jeton du job passé sur l'entrée standard : le serveur n'a aucun identifiant GitHub à garder.
+          echo "$GHCR_TOKEN" | ssh "$SSH_TARGET" "docker login ghcr.io -u ${{ github.actor }} --password-stdin \
+            && cd ~/foot-primal \
+            && export IMAGE_TAG=${{ github.sha }} \
+            && docker compose -f docker-compose.prod.yml pull \
+            && docker compose -f docker-compose.prod.yml up -d \
+            && docker image prune -f; docker logout ghcr.io"

@@ -65,12 +65,22 @@ Tests back : `docker compose exec backend npm test` (unitaires), `docker compose
 
 ## Production
 
-Sur le serveur (ports 80 et 443 ouverts, `DOMAIN` et `api.DOMAIN` pointant vers lui) :
+URL : https://foot.benit.ooo, API sous https://foot.benit.ooo/api (relayée par le front).
+HTTPS assuré par Caddy sur le serveur (`/etc/caddy/Caddyfile` : `foot.benit.ooo { reverse_proxy 127.0.0.1:3001 }`).
 
-```bash
-cp .env.example .env   # remplir DOMAIN, ACME_EMAIL, POSTGRES_PASSWORD
-docker compose -f docker-compose.prod.yml up -d --build
-```
+À chaque push sur `main`, `.github/workflows/prod.yml` lance les tests, publie l'image sur
+`ghcr.io/natolive/foot-primal` (tags `latest` et commit), copie `docker-compose.prod.yml` sur le serveur puis y fait
+`docker compose pull && up -d`. Le serveur ne contient que `~/foot-primal/{docker-compose.prod.yml,.env}` : ni code, ni build.
+Migrations appliquées au démarrage de l'API, base et API non exposées.
 
-HTTPS via Let's Encrypt (Traefik), migrations appliquées au démarrage de l'API, base non exposée.
-Mise à jour : `git pull` puis la même commande.
+Mise en place, une fois :
+
+1. Serveur : Docker installé, `mkdir ~/foot-primal` et y créer `.env` depuis `.env.example`.
+2. Clé SSH de la CI : `ssh-keygen -t ed25519 -f primal-ci -N ''`, ajouter `primal-ci.pub`
+   à `~/.ssh/authorized_keys` du serveur.
+3. GitHub → Settings → Environments → `production`, secrets :
+   `SSH_HOST`, `SSH_USER`, `SSH_PRIVATE_KEY` (contenu de `primal-ci`), `SSH_KNOWN_HOSTS` (sortie de `ssh-keyscan <hôte>`).
+4. Premier push sur `main`, puis créer son compte et passer super admin :
+   `docker compose -f docker-compose.prod.yml exec db psql -U primal -c "UPDATE users SET role = 'super_admin' WHERE email = '…'"`.
+
+Revenir à une version : sur le serveur, `IMAGE_TAG=<commit> docker compose -f docker-compose.prod.yml up -d`.
