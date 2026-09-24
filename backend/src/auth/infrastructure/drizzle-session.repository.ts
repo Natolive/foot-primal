@@ -27,4 +27,8 @@ export class DrizzleSessionRepository
   async deleteByTokenHash(tokenHash: string): Promise<void> {
     await this.db.delete(sessions).where(eq(sessions.tokenHash, tokenHash));
   }
+
+  async deleteByUserId(userId: string): Promise<void> {
+    await this.db.delete(sessions).where(eq(sessions.userId, userId));
+  }
 }

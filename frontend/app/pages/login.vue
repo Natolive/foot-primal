@@ -34,7 +34,7 @@ async function onLogin(data: LoginDto) {
 
     <FormBuilder v-model:state="state" :schema="loginSchema" :fields="fields" :submit="onLogin" submit-label="Se connecter" class="mt-10">
       <template #hint-password>
-        <ULink to="#" class="text-primary text-sm font-medium">Mot de passe oublié ?</ULink>
+        <ULink to="/forgot-password" class="text-primary text-sm font-medium">Mot de passe oublié ?</ULink>
       </template>
     </FormBuilder>
 

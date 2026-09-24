@@ -15,5 +15,13 @@ export const users = pgTable('users', {
   extraPermissions: text('extra_permissions').array().$type<Permission[]>().notNull().default(sql`'{}'`),
   // Visite guidée affichée ; null tant qu'elle ne l'a pas été.
   onboardedAt: timestamp('onboarded_at', { withTimezone: true }),
+  // Email confirmé par le lien reçu à l'inscription ; null tant que ce n'est pas fait (connexion refusée).
+  emailVerifiedAt: timestamp('email_verified_at', { withTimezone: true }),
+  // Hash du jeton du lien de confirmation ; null une fois l'email confirmé.
+  emailVerificationTokenHash: text('email_verification_token_hash').unique(),
+  emailVerificationExpiresAt: timestamp('email_verification_expires_at', { withTimezone: true }),
+  // Lien « mot de passe oublié » en cours ; null sinon.
+  passwordResetTokenHash: text('password_reset_token_hash').unique(),
+  passwordResetExpiresAt: timestamp('password_reset_expires_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });

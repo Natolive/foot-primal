@@ -3,7 +3,7 @@ import { Test } from '@nestjs/testing';
 import { AppModule } from '@src/app.module.js';
 import { DB, type Database } from '@src/common/infrastructure/database/database.module.js';
 import { users } from '@src/users/infrastructure/user.table.js';
-import { inArray } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import request from 'supertest';
 
 // Organisation puis inscriptions sur la vraie base, verrou compris.
@@ -16,6 +16,8 @@ describe('Events (e2e)', () => {
   const agent = async (email: string) => {
     const http = request.agent(app.getHttpServer());
     await http.post('/auth/signup').send({ lastName: 'Dupont', firstName: 'Léa', email, password: '12345678' }).expect(201);
+    // Confirmation par email couverte par auth.e2e-spec.
+    await db.update(users).set({ emailVerifiedAt: new Date() }).where(eq(users.email, email));
     await http.post('/auth/login').send({ email, password: '12345678' }).expect(200);
     return http;
   };

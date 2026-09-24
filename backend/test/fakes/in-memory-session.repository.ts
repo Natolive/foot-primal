@@ -10,4 +10,8 @@ export class InMemorySessionRepository extends InMemoryRepository<Session, NewSe
   async deleteByTokenHash(tokenHash: string) {
     this.rows = this.rows.filter((s) => s.tokenHash !== tokenHash);
   }
+
+  async deleteByUserId(userId: string) {
+    this.rows = this.rows.filter((s) => s.userId !== userId);
+  }
 }

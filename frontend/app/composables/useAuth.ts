@@ -1,4 +1,4 @@
-import type { LoginDto, UserDto } from '@primal/shared'
+import type { ForgotPasswordDto, LoginDto, ResetPasswordDto, UserDto, VerifyEmailDto } from '@primal/shared'
 
 export const useAuth = () => {
   // undefined : session pas encore vérifiée ; null : pas connecté.
@@ -13,10 +13,25 @@ export const useAuth = () => {
     user.value = await api<UserDto>('/auth/login', { method: 'POST', body: credentials })
   }
 
+  // Confirme l'email (lien de l'inscription) et connecte.
+  async function verifyEmail(dto: VerifyEmailDto) {
+    user.value = await api<UserDto>('/auth/verify-email', { method: 'POST', body: dto })
+  }
+
+  // Envoie le lien « mot de passe oublié » (même réponse que le compte existe ou non).
+  async function forgotPassword(dto: ForgotPasswordDto) {
+    await api('/auth/forgot-password', { method: 'POST', body: dto })
+  }
+
+  // Nouveau mot de passe depuis le lien reçu, puis connecte.
+  async function resetPassword(dto: ResetPasswordDto) {
+    user.value = await api<UserDto>('/auth/reset-password', { method: 'POST', body: dto })
+  }
+
   async function logout() {
     await api('/auth/logout', { method: 'POST' })
     user.value = null
   }
 
-  return { user, fetchUser, login, logout }
+  return { user, fetchUser, login, verifyEmail, forgotPassword, resetPassword, logout }
 }

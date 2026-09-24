@@ -15,6 +15,8 @@ services:
       - --providers.docker.exposedbydefault=false
       - --entrypoints.web.address=:80
       - --api.dashboard=true
+      # Une ligne par requête dans `docker compose logs traefik` (débogage front ↔ API).
+      - --accesslog=true
     ports:
       - "80:80"
     volumes:
@@ -41,6 +43,13 @@ services:
       timeout: 5s
       retries: 15
 
+  mailpit:
+    image: axllent/mailpit:latest
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mailpit.rule=Host(`mail.foot-primal.localhost`)
+      - traefik.http.services.mailpit.loadbalancer.server.port=8025
+
   backend:
     <<: *app
     working_dir: /repo/backend
@@ -48,9 +57,14 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      mailpit:
+        condition: service_started
     environment:
       - CORS_ORIGIN=http://foot-primal.localhost
       - DATABASE_URL=postgres://primal:primal@db:5432/primal
+      - APP_URL=http://foot-primal.localhost
+      # Emails gardés par Mailpit, jamais envoyés : http://mail.foot-primal.localhost
+      - MAILPIT_URL=http://mailpit:8025
     labels:
       - traefik.enable=true
       - traefik.http.routers.backend.rule=Host(`api.foot-primal.localhost`)

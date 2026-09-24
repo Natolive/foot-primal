@@ -32,6 +32,9 @@ services:
       - CORS_ORIGIN=https://${DOMAIN:?}
       - COOKIE_SECURE=true
       - DATABASE_URL=postgres://primal:${POSTGRES_PASSWORD}@db:5432/primal
+      - APP_URL=https://${DOMAIN}
+      - BREVO_API_KEY=${BREVO_API_KEY:?}
+      - MAIL_FROM=${MAIL_FROM:?}
 
   frontend:
     <<: *app

@@ -8,6 +8,7 @@ docker compose up --build
 
 - http://foot-primal.localhost — front Nuxt 4 (Nuxt UI)
 - http://api.foot-primal.localhost — API NestJS
+- http://mail.foot-primal.localhost — Mailpit : emails envoyés en dev (jamais vraiment envoyés)
 - http://traefik.foot-primal.localhost — dashboard Traefik
 - PostgreSQL : `localhost:5432`, base/utilisateur/mot de passe `primal` (dev)
 
@@ -18,7 +19,7 @@ Espace de travail npm (un seul `package-lock.json` à la racine) :
 ```
 shared/     @primal/shared : schémas Zod + types (DTO) partagés front/back
   src/common/   champs réutilisables (email, règles mot de passe)
-  src/auth/     login.dto.ts, signup.dto.ts
+  src/auth/     login, signup, verify-email, password-reset (.dto.ts)
   src/roles/    permissions.ts (droits, rôles, défauts), role.dto.ts
   src/users/    user.dto.ts, managed-user.dto.ts
   src/events/   event.dto.ts (créneau, réponse au sondage)
@@ -28,8 +29,9 @@ backend/    NestJS
     domain/              entités, ports (classes abstraites), erreurs métier
     application/         services (cas d'usage)
     infrastructure/      adaptateurs : Drizzle, HTTP (controllers), etc.
+  src/mail/            emails : port Mailer, templates (application/templates/), adaptateurs Brevo et Mailpit
   src/common/          BaseRepository, BaseService, DrizzleRepository, DatabaseModule,
-                       DomainErrorFilter (erreur métier → HTTP), ZodValidationPipe
+                       DomainErrorFilter (erreur métier → HTTP), ZodValidationPipe, RateLimit
   drizzle/             migrations SQL (appliquées au démarrage)
 frontend/   Nuxt 4
   app/components/brand/  logo, élément graphique
@@ -37,7 +39,7 @@ frontend/   Nuxt 4
   app/components/form/   FormBuilder (formulaire généré depuis une liste de champs + schéma)
   app/composables/       useApi, useAuth, useOnboardingTour (visite guidée driver.js)
   app/layouts/           default (navbar), auth (bandeau de marque sur grand écran + formulaire)
-  app/pages/             index (créneaux), login, signup,
+  app/pages/             index (créneaux), login, signup, verify-email, forgot-password, reset-password,
                          settings/ : users (administration), roles (droits des rôles),
                          email-domains (domaines autorisés à créer un compte)
   app/utils/             permissionGroups (droits groupés par catégorie)
@@ -57,10 +59,39 @@ Tests back : `docker compose exec backend npm test` (unitaires), `docker compose
 - Rôles : `user` répond aux sondages, `admin` organise aussi les créneaux (catégorie de droits `planning`), `super_admin` a tout.
   Premier super admin : `UPDATE users SET role = 'super_admin' WHERE email = '…'`.
 
+## Emails
+
+- Envoyés par l'API transactionnelle de Brevo (`src/mail/infrastructure/brevo-mailer.ts`), sans SDK.
+- Un email = un template `src/mail/application/templates/<nom>.mail.ts` qui renvoie `{ to, subject, html }`
+  dans le cadre commun `layout()` ; valeurs insérées via `html\`\`` (échappées automatiquement).
+  Envoi : `mailer.send(monMail(...))`, avec `MailModule` importé dans le module.
+- Dev : les emails arrivent dans Mailpit (http://mail.foot-primal.localhost), rien ne part vraiment.
+  Sans Mailpit ni `BREVO_API_KEY` (CI), l'email s'affiche dans les logs du back.
+
+## Comptes
+
+- Inscription : réservée aux domaines email autorisés, envoie un lien de confirmation (`/verify-email?token=…`,
+  valable 48 h) ; connexion refusée (403) tant que l'email n'est pas confirmé.
+- La page du lien redemande le mot de passe de l'inscription, puis connecte : un tiers qui s'inscrit avec l'email
+  d'un collègue ne peut pas récupérer le compte, même si le collègue ouvre le lien.
+- Se réinscrire avec un email pas encore confirmé remplace le compte et renvoie un lien (faute de frappe, lien perdu).
+- Mot de passe oublié : lien valable 1 h (`/reset-password?token=…`) ; le nouveau mot de passe déconnecte toutes les
+  sessions, connecte, et confirme l'email si ce n'était pas fait. Même réponse que le compte existe ou non.
+- Jetons des liens stockés hachés (SHA-256), à usage unique ; un nouveau lien remplace le précédent.
+- Limites par route (`@RateLimit`, en mémoire, 429 au-delà) :
+
+  | Route | Par email | Par IP |
+  | --- | --- | --- |
+  | `signup`, `forgot-password` | 3 / h | 30 / h |
+  | `login` | 10 / 15 min | 50 / 15 min |
+  | `verify-email`, `reset-password` | — | 20 / 15 min |
+
+  IP lue dans `X-Forwarded-For` (`trust proxy`) : l'API ne doit jamais être exposée sans Caddy ou Traefik devant.
+
 ## Visite guidée
 
-- Après l'inscription, la personne est connectée et arrive sur les créneaux, où une visite guidée (driver.js) montre
-  un créneau, le sondage et le lien de paiement.
+- À la première connexion (après la confirmation de l'email), la personne arrive sur les créneaux, où une visite
+  guidée (driver.js) montre un créneau, le sondage et le lien de paiement.
 - Elle s'affiche une seule fois par compte : `POST /auth/me/onboarding` (droit `profile.complete_onboarding`) remplit
   `users.onboarded_at` dès l'affichage, renvoyé dans `UserDto.onboarded`.
 - Le temps de la visite, un créneau d'exemple non cliquable est affiché en tête de liste, même sans vrai créneau.
@@ -78,7 +109,8 @@ Migrations appliquées au démarrage de l'API, base et API non exposées.
 
 Mise en place, une fois :
 
-1. Serveur : Docker installé, `mkdir ~/foot-primal` et y créer `.env` depuis `.env.example`.
+1. Serveur : Docker installé, `mkdir ~/foot-primal` et y créer `.env` depuis `.env.example`
+   (dont `BREVO_API_KEY` et `MAIL_FROM`, expéditeur validé dans Brevo).
 2. Clé SSH de la CI : `ssh-keygen -t ed25519 -f primal-ci -N ''`, ajouter `primal-ci.pub`
    à `~/.ssh/authorized_keys` du serveur.
 3. GitHub → Settings → Environments → `production`, secrets :

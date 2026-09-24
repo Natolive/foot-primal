@@ -16,12 +16,12 @@ const fields: FormFieldConfig<SignupDto>[] = [
 
 const toast = useToast()
 const api = useApi()
-const { login } = useAuth()
+// Email auquel le lien de confirmation a été envoyé.
+const sentTo = ref<string>()
 
 async function signup(data: SignupDto) {
   try {
     await api('/auth/signup', { method: 'POST', body: data })
-    await login({ email: data.email, password: data.password })
   } catch (e) {
     toast.add({
       title: 'Création du compte impossible',
@@ -31,21 +31,31 @@ async function signup(data: SignupDto) {
     })
     return
   }
-  toast.add({ title: 'Compte créé', description: 'Bienvenue sur Primal.', color: 'success', icon: 'i-lucide-check' })
-  await navigateTo('/')
+  toast.add({ title: 'Compte créé', description: 'Confirme ton email pour te connecter.', color: 'success', icon: 'i-lucide-check' })
+  sentTo.value = data.email
 }
 </script>
 
 <template>
   <div>
-    <h1 class="font-display text-highlighted text-5xl font-black uppercase leading-none">Créer un compte</h1>
-    <p class="text-muted mt-3">Crée ton compte pour réserver ta place sur les prochains créneaux.</p>
+    <div v-if="sentTo">
+      <h1 class="font-display text-highlighted text-5xl font-black uppercase leading-none">Vérifie tes mails</h1>
+      <p class="text-muted mt-3">
+        On t'a envoyé un lien à <span class="text-highlighted font-medium">{{ sentTo }}</span> : ouvre-le pour activer ton compte.
+        Rien reçu ? Regarde dans les spams, ou réinscris-toi pour recevoir un nouveau lien.
+      </p>
+      <UButton label="Recommencer l'inscription" variant="soft" icon="i-lucide-rotate-ccw" class="mt-8" @click="sentTo = undefined" />
+    </div>
+    <div v-else>
+      <h1 class="font-display text-highlighted text-5xl font-black uppercase leading-none">Créer un compte</h1>
+      <p class="text-muted mt-3">Crée ton compte pour réserver ta place sur les prochains créneaux.</p>
 
-    <FormBuilder v-model:state="state" :schema="signupSchema" :fields="fields" :submit="signup" submit-label="Créer mon compte" class="mt-10" />
+      <FormBuilder v-model:state="state" :schema="signupSchema" :fields="fields" :submit="signup" submit-label="Créer mon compte" class="mt-10" />
 
-    <p class="text-muted mt-8 text-sm">
-      Déjà un compte ?
-      <ULink to="/login" class="text-primary font-medium">Se connecter</ULink>
-    </p>
+      <p class="text-muted mt-8 text-sm">
+        Déjà un compte ?
+        <ULink to="/login" class="text-primary font-medium">Se connecter</ULink>
+      </p>
+    </div>
   </div>
 </template>

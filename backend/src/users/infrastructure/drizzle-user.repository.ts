@@ -16,4 +16,14 @@ export class DrizzleUserRepository extends DrizzleRepository<typeof users, User,
     const [user] = await this.db.select().from(users).where(eq(users.email, email)).limit(1);
     return user ?? null;
   }
+
+  async findByVerificationTokenHash(tokenHash: string): Promise<User | null> {
+    const [user] = await this.db.select().from(users).where(eq(users.emailVerificationTokenHash, tokenHash)).limit(1);
+    return user ?? null;
+  }
+
+  async findByPasswordResetTokenHash(tokenHash: string): Promise<User | null> {
+    const [user] = await this.db.select().from(users).where(eq(users.passwordResetTokenHash, tokenHash)).limit(1);
+    return user ?? null;
+  }
 }

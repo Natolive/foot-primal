@@ -11,7 +11,7 @@
 - Textes en français, tutoiement, bouton = verbe d'action repris dans le toast.
 - SPA (`ssr: false`) : pas de code qui suppose un rendu serveur.
 - Appels API via `useApi()` (cookie de session inclus), erreur affichée avec `apiErrorMessage(e)` dans un toast.
-- Utilisateur connecté via `useAuth()` (`user`, `login`, `logout`), jamais d'appel direct à `/auth/*`.
+- Utilisateur connecté via `useAuth()` (`user`, `login`, `logout`, `verifyEmail`, `forgotPassword`, `resetPassword`), jamais d'appel direct à `/auth/*`.
 - Pages privées par défaut (middleware `auth.global.ts`) ; `definePageMeta({ guest: true })` pour les pages visiteurs.
 - Visite guidée : étapes dans `useOnboardingTour`, élément ciblé par un attribut `data-tour="<nom>"` (jamais une classe CSS).
 - Page réservée : `definePageMeta({ permission: '<droit>' })` ; action masquée si `!user.permissions.includes('<droit>')`.

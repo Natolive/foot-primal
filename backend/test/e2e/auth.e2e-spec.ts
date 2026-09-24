@@ -1,8 +1,10 @@
 import type { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { AppModule } from '@src/app.module.js';
+import { Mailer } from '@src/mail/domain/mailer.js';
 import { DB, type Database } from '@src/common/infrastructure/database/database.module.js';
 import { users } from '@src/users/infrastructure/user.table.js';
+import { FakeMailer } from '@test/fakes/fake-mailer.js';
 import { eq } from 'drizzle-orm';
 import request from 'supertest';
 
@@ -12,9 +14,13 @@ describe('Auth (e2e)', () => {
   const account = { lastName: 'Dupont', firstName: 'Léa', email, password: '12345678' };
   let app: INestApplication;
   let db: Database;
+  const mailer = new FakeMailer();
 
   beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
+    const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
+      .overrideProvider(Mailer)
+      .useValue(mailer)
+      .compile();
     app = moduleRef.createNestApplication();
     await app.init();
     db = app.get(DB);
@@ -25,12 +31,18 @@ describe('Auth (e2e)', () => {
     await app.close();
   });
 
-  it('signs up, logs in, reads the profile, then logs out', async () => {
+  it('signs up, confirms the email, logs in, reads the profile, then logs out', async () => {
     const http = request.agent(app.getHttpServer());
 
     await http.post('/auth/signup').send(account).expect(201);
-    await http.post('/auth/signup').send(account).expect(409);
     await http.post('/auth/signup').send({ ...account, email: `e2e-${Date.now()}@gmail.com` }).expect(400);
+    await http.post('/auth/login').send({ email, password: account.password }).expect(403);
+    await http.post('/auth/verify-email').send({ token: 'nope', password: account.password }).expect(404);
+    await http.post('/auth/verify-email').send({ token: mailer.lastToken(), password: 'wrong-password' }).expect(401);
+    const verified = await http.post('/auth/verify-email').send({ token: mailer.lastToken(), password: account.password });
+    expect(verified.status).toBe(200);
+    expect(verified.headers['set-cookie']?.[0]).toMatch(/primal_session=.+HttpOnly/);
+    await http.post('/auth/signup').send(account).expect(409);
     await http.post('/auth/login').send({ email, password: 'wrong-password' }).expect(401);
 
     const login = await http.post('/auth/login').send({ email, password: account.password }).expect(200);
@@ -63,5 +75,20 @@ describe('Auth (e2e)', () => {
 
     await http.post('/auth/logout').expect(204);
     await http.get('/auth/me').expect(401);
+
+    await http.post('/auth/forgot-password').send({ email: 'nobody@solem.fr' }).expect(204);
+    await http.post('/auth/forgot-password').send({ email }).expect(204);
+    await http.post('/auth/reset-password').send({ token: mailer.lastToken(), password: 'court' }).expect(400);
+    await http.post('/auth/reset-password').send({ token: mailer.lastToken(), password: 'new-password' }).expect(200);
+    await http.get('/auth/me').expect(200);
+    await http.post('/auth/login').send({ email, password: 'new-password' }).expect(200);
+  });
+
+  it('limits signups per email', async () => {
+    const http = request(app.getHttpServer());
+    // Domaine refusé : aucun compte créé, mais chaque essai compte.
+    const other = { ...account, email: `e2e-limit-${Date.now()}@gmail.com` };
+    for (let i = 0; i < 3; i++) await http.post('/auth/signup').send(other).expect(400);
+    await http.post('/auth/signup').send(other).expect(429);
   });
 });

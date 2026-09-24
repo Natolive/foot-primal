@@ -17,6 +17,14 @@ export class UsersService extends BaseService<User, NewUser> {
     return this.repository.findByEmail(email);
   }
 
+  findByVerificationTokenHash(tokenHash: string): Promise<User | null> {
+    return this.repository.findByVerificationTokenHash(tokenHash);
+  }
+
+  findByPasswordResetTokenHash(tokenHash: string): Promise<User | null> {
+    return this.repository.findByPasswordResetTokenHash(tokenHash);
+  }
+
   // Idempotent : la date de la première visite est conservée.
   async completeOnboarding(id: string): Promise<void> {
     const user = await this.findById(id);

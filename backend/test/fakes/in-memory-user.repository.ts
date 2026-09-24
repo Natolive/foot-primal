@@ -5,10 +5,21 @@ import { InMemoryRepository } from './in-memory.repository.js';
 export class InMemoryUserRepository extends InMemoryRepository<User, NewUser> implements UserRepository {
   // Mêmes défauts que les colonnes en base.
   override create(data: NewUser) {
-    return super.create({ role: 'user', extraPermissions: [], onboardedAt: null, ...data });
+    return super.create({ role: 'user', extraPermissions: [], onboardedAt: null, emailVerifiedAt: null, emailVerificationTokenHash: null, emailVerificationExpiresAt: null,
+      passwordResetTokenHash: null,
+      passwordResetExpiresAt: null,
+      ...data });
   }
 
   async findByEmail(email: string) {
     return this.rows.find((u) => u.email === email) ?? null;
+  }
+
+  async findByVerificationTokenHash(tokenHash: string) {
+    return this.rows.find((u) => u.emailVerificationTokenHash === tokenHash) ?? null;
+  }
+
+  async findByPasswordResetTokenHash(tokenHash: string) {
+    return this.rows.find((u) => u.passwordResetTokenHash === tokenHash) ?? null;
   }
 }
