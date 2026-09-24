@@ -109,12 +109,14 @@ Migrations appliquées au démarrage de l'API, base et API non exposées.
 
 Mise en place, une fois :
 
-1. Serveur : Docker installé, `mkdir ~/foot-primal` et y créer `.env` depuis `.env.example`
-   (dont `BREVO_API_KEY` et `MAIL_FROM`, expéditeur validé dans Brevo).
+1. Serveur : Docker installé, `mkdir ~/foot-primal` et y créer `.env` depuis `.env.example`.
 2. Clé SSH de la CI : `ssh-keygen -t ed25519 -f primal-ci -N ''`, ajouter `primal-ci.pub`
    à `~/.ssh/authorized_keys` du serveur.
 3. GitHub → Settings → Environments → `production`, secrets :
-   `SSH_HOST`, `SSH_USER`, `SSH_PRIVATE_KEY` (contenu de `primal-ci`), `SSH_KNOWN_HOSTS` (sortie de `ssh-keyscan <hôte>`).
+   `SSH_HOST`, `SSH_USER`, `SSH_PRIVATE_KEY` (contenu de `primal-ci`), `SSH_KNOWN_HOSTS` (sortie de `ssh-keyscan <hôte>`),
+   `BREVO_API_KEY` (clé API v3 `xkeysib-…`, recopiée dans le `.env` du serveur à chaque déploiement) :
+   `gh secret set BREVO_API_KEY --env production`.
+   Brevo : expéditeur `noreply@noreply.benit.ooo` et domaine `noreply.benit.ooo` authentifiés (DNS).
 4. Premier push sur `main`, puis créer son compte et passer super admin :
    `docker compose -f docker-compose.prod.yml exec db psql -U primal -c "UPDATE users SET role = 'super_admin' WHERE email = '…'"`.
 
