@@ -8,7 +8,7 @@ useHead({ title: 'Connexion · Primal' })
 
 const state = ref<LoginDto>({ email: '', password: '', remember: true })
 const fields: FormFieldConfig<LoginDto>[] = [
-  { name: 'email', label: 'Email', type: 'email', autocomplete: 'email', placeholder: 'prenom.nom@entreprise.fr', icon: 'i-lucide-mail' },
+  { name: 'email', label: 'Email', type: 'email', autocomplete: 'email', placeholder: 'prenom.nom@solem.fr', icon: 'i-lucide-mail' },
   { name: 'password', label: 'Mot de passe', type: 'password', autocomplete: 'current-password' },
   { name: 'remember', label: 'Rester connecté', type: 'checkbox' },
 ]

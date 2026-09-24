@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
+import { EmailDomainsModule } from '../email-domains/email-domains.module.js';
 import { RolesModule } from '../roles/roles.module.js';
 import { UsersModule } from '../users/users.module.js';
 import { AuthService } from './application/auth.service.js';
@@ -11,7 +12,7 @@ import { SessionGuard } from './infrastructure/http/session.guard.js';
 import { ScryptPasswordHasher } from './infrastructure/scrypt-password-hasher.js';
 
 @Module({
-  imports: [UsersModule, RolesModule],
+  imports: [UsersModule, RolesModule, EmailDomainsModule],
   controllers: [AuthController],
   providers: [
     AuthService,

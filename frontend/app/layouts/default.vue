@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ROLE_LABELS, type Permission } from '@primal/shared'
+import { ROLE_LABELS } from '@primal/shared'
 import type { DropdownMenuItem } from '@nuxt/ui'
 
 const { user, logout } = useAuth()
@@ -15,15 +15,9 @@ async function onLogout() {
   await navigateTo('/login')
 }
 
-// Liens affichés selon les droits ; sans droit, le lien n'apparaît pas.
-const links = computed(() =>
-  ([
-    { to: '/', label: 'Créneaux', icon: 'i-lucide-calendar-days' },
-    { to: '/users', label: 'Utilisateurs', icon: 'i-lucide-users', permission: 'users.read' },
-    { to: '/roles', label: 'Droits', icon: 'i-lucide-shield', permission: 'roles.read' },
-  ] satisfies { to: string, label: string, icon: string, permission?: Permission }[])
-    .filter((l) => !('permission' in l) || user.value?.permissions.includes(l.permission)),
-)
+// Paramètres regroupés dans un seul menu ; sans droit, l'entrée n'apparaît pas (ni le menu s'il est vide).
+const settings = computed(() => allowedSettingsLinks(user.value?.permissions))
+const route = useRoute()
 
 const fullName = computed(() => `${user.value?.firstName ?? ''} ${user.value?.lastName ?? ''}`.trim())
 
@@ -43,20 +37,31 @@ const menu = computed<DropdownMenuItem[][]>(() => [
 
         <nav aria-label="Navigation principale" class="flex flex-1 items-center gap-1 sm:justify-center">
           <UButton
-            v-for="link in links"
-            :key="link.to"
-            :to="link.to"
-            :icon="link.icon"
-            :aria-label="link.label"
-            :exact="link.to === '/'"
+            to="/"
+            icon="i-lucide-calendar-days"
+            aria-label="Créneaux"
+            exact
             color="neutral"
             variant="ghost"
             class="hover:text-chalk font-medium hover:bg-white/10"
             active-class="text-chalk bg-white/10"
             inactive-class="text-chalk/70"
           >
-            <span class="hidden sm:inline">{{ link.label }}</span>
+            <span class="hidden sm:inline">Créneaux</span>
           </UButton>
+          <UDropdownMenu v-if="settings.length" :items="settings">
+            <UButton
+              icon="i-lucide-settings"
+              trailing-icon="i-lucide-chevron-down"
+              aria-label="Paramètres"
+              color="neutral"
+              variant="ghost"
+              class="hover:text-chalk font-medium hover:bg-white/10"
+              :class="route.path.startsWith('/settings') ? 'text-chalk bg-white/10' : 'text-chalk/70'"
+            >
+              <span class="hidden sm:inline">Paramètres</span>
+            </UButton>
+          </UDropdownMenu>
         </nav>
 
         <UDropdownMenu :items="menu" :content="{ align: 'end' }">

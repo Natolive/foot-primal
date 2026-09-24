@@ -13,6 +13,9 @@ export const PERMISSIONS = [
   'planning.create_event',
   'planning.update_event',
   'planning.delete_event',
+  'email_domains.read',
+  'email_domains.create',
+  'email_domains.delete',
 ] as const
 export type Permission = (typeof PERMISSIONS)[number]
 
@@ -30,6 +33,9 @@ export const PERMISSION_LABELS: Record<Permission, string> = {
   'planning.create_event': 'Créer des créneaux',
   'planning.update_event': 'Modifier les créneaux',
   'planning.delete_event': 'Supprimer les créneaux',
+  'email_domains.read': 'Voir les domaines email autorisés',
+  'email_domains.create': 'Autoriser un domaine email',
+  'email_domains.delete': 'Retirer un domaine email',
 }
 
 // Catégorie = préfixe du droit (`roles.manage` → `roles`) : un nouveau préfixe oblige à lui donner un libellé.
@@ -41,6 +47,7 @@ export const PERMISSION_CATEGORY_LABELS: Record<PermissionCategory, string> = {
   users: 'Utilisateurs',
   events: 'Créneaux',
   planning: 'Organisation des créneaux',
+  email_domains: 'Domaines email autorisés',
 }
 
 export const PERMISSION_CATEGORIES = (Object.keys(PERMISSION_CATEGORY_LABELS) as PermissionCategory[]).map((category) => ({
@@ -54,8 +61,9 @@ export type Role = (typeof ROLES)[number]
 
 export const ROLE_LABELS: Record<Role, string> = { user: 'Utilisateur', admin: 'Admin', super_admin: 'Super admin' }
 
-// Catégories réservées par défaut au super admin : la main sur les comptes, les droits et l'organisation des créneaux.
-const ADMIN_CATEGORIES: readonly PermissionCategory[] = ['roles', 'users', 'planning']
+// Catégories réservées par défaut au super admin : la main sur les comptes, les droits, l'organisation des créneaux
+// et les domaines email autorisés à s'inscrire.
+const ADMIN_CATEGORIES: readonly PermissionCategory[] = ['roles', 'users', 'planning', 'email_domains']
 const isAdmin = (p: Permission) => ADMIN_CATEGORIES.some((c) => p.startsWith(`${c}.`))
 
 // Droits par défaut, tant qu'un admin ne les a pas modifiés : user a tout sauf l'administration,

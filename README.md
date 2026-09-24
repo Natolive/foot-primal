@@ -22,8 +22,9 @@ shared/     @primal/shared : schémas Zod + types (DTO) partagés front/back
   src/roles/    permissions.ts (droits, rôles, défauts), role.dto.ts
   src/users/    user.dto.ts, managed-user.dto.ts
   src/events/   event.dto.ts (créneau, réponse au sondage)
+  src/email-domains/ email-domain.dto.ts (domaine autorisé à créer un compte)
 backend/    NestJS
-  src/<domaine>/       auth, users, roles, events ; architecture hexagonale :
+  src/<domaine>/       auth, users, roles, events, email-domains ; architecture hexagonale :
     domain/              entités, ports (classes abstraites), erreurs métier
     application/         services (cas d'usage)
     infrastructure/      adaptateurs : Drizzle, HTTP (controllers), etc.
@@ -36,7 +37,9 @@ frontend/   Nuxt 4
   app/components/form/   FormBuilder (formulaire généré depuis une liste de champs + schéma)
   app/composables/       useApi, useAuth, useOnboardingTour (visite guidée driver.js)
   app/layouts/           default (navbar), auth (bandeau de marque sur grand écran + formulaire)
-  app/pages/             index (créneaux), login, signup, users (administration), roles (droits des rôles)
+  app/pages/             index (créneaux), login, signup,
+                         settings/ : users (administration), roles (droits des rôles),
+                         email-domains (domaines autorisés à créer un compte)
   app/utils/             permissionGroups (droits groupés par catégorie)
   app/types/
 ```

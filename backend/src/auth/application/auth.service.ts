@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PERMISSIONS, type LoginDto, type Permission, type SignupDto } from '@primal/shared';
 import { createHash, randomBytes } from 'node:crypto';
+import { EmailDomainsService } from '../../email-domains/application/email-domains.service.js';
 import { RolesService } from '../../roles/application/roles.service.js';
 import { UsersService } from '../../users/application/users.service.js';
 import { EmailAlreadyUsedError } from '../../users/domain/errors.js';
@@ -37,9 +38,11 @@ export class AuthService {
     private readonly hasher: PasswordHasher,
     private readonly sessions: SessionRepository,
     private readonly roles: RolesService,
+    private readonly emailDomains: EmailDomainsService,
   ) {}
 
   async signup({ password, ...dto }: SignupDto): Promise<AuthenticatedUser> {
+    await this.emailDomains.assertAllowed(dto.email);
     if (await this.users.findByEmail(dto.email)) throw new EmailAlreadyUsedError();
     const user = await this.users.create({ ...dto, passwordHash: await this.hasher.hash(password) });
     return this.withPermissions(user);

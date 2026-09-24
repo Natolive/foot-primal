@@ -10,7 +10,7 @@ const state = ref<SignupDto>({ lastName: '', firstName: '', email: '', password:
 const fields: FormFieldConfig<SignupDto>[] = [
   { name: 'lastName', label: 'Nom', autocomplete: 'family-name', half: true },
   { name: 'firstName', label: 'Prénom', autocomplete: 'given-name', half: true },
-  { name: 'email', label: 'Email', type: 'email', autocomplete: 'email', placeholder: 'prenom.nom@entreprise.fr', icon: 'i-lucide-mail' },
+  { name: 'email', label: 'Email', type: 'email', autocomplete: 'email', placeholder: 'prenom.nom@solem.fr', icon: 'i-lucide-mail' },
   { name: 'password', label: 'Mot de passe', type: 'password', autocomplete: 'new-password', help: `${PASSWORD_MIN} caractères minimum.` },
 ]
 

@@ -4,22 +4,27 @@ import {
   MissingPermissionError,
   SessionExpiredError,
 } from '@src/auth/domain/errors.js';
+import { EmailDomainsService } from '@src/email-domains/application/email-domains.service.js';
+import { EmailDomainNotAllowedError } from '@src/email-domains/domain/errors.js';
 import { RolesService } from '@src/roles/application/roles.service.js';
 import { UsersService } from '@src/users/application/users.service.js';
 import { EmailAlreadyUsedError } from '@src/users/domain/errors.js';
+import { InMemoryEmailDomainRepository } from '@test/fakes/in-memory-email-domain.repository.js';
 import { FakePasswordHasher } from '@test/fakes/fake-password-hasher.js';
 import { InMemoryRolePermissionRepository } from '@test/fakes/in-memory-role-permission.repository.js';
 import { InMemorySessionRepository } from '@test/fakes/in-memory-session.repository.js';
 import { InMemoryUserRepository } from '@test/fakes/in-memory-user.repository.js';
 
 describe('AuthService', () => {
-  const dto = { lastName: 'Dupont', firstName: 'Léa', email: 'lea@boite.fr', password: '12345678' };
+  const dto = { lastName: 'Dupont', firstName: 'Léa', email: 'lea@solem.fr', password: '12345678' };
   const credentials = { email: dto.email, password: dto.password };
   let users: InMemoryUserRepository;
   let sessions: InMemorySessionRepository;
   let auth: AuthService;
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    const emailDomains = new EmailDomainsService(new InMemoryEmailDomainRepository());
+    await emailDomains.allow({ domain: 'solem.fr' });
     users = new InMemoryUserRepository();
     sessions = new InMemorySessionRepository();
     auth = new AuthService(
@@ -27,6 +32,7 @@ describe('AuthService', () => {
       new FakePasswordHasher(),
       sessions,
       new RolesService(new InMemoryRolePermissionRepository()),
+      emailDomains,
     );
   });
 
@@ -40,6 +46,11 @@ describe('AuthService', () => {
     it('rejects an email already used', async () => {
       await auth.signup(dto);
       await expect(auth.signup(dto)).rejects.toBeInstanceOf(EmailAlreadyUsedError);
+    });
+
+    it('rejects an email outside the allowed domains', async () => {
+      await expect(auth.signup({ ...dto, email: 'lea@gmail.com' })).rejects.toBeInstanceOf(EmailDomainNotAllowedError);
+      expect(users.rows).toHaveLength(0);
     });
   });
 
@@ -64,7 +75,7 @@ describe('AuthService', () => {
       await expect(auth.login({ ...credentials, password: 'wrong-password' })).rejects.toBeInstanceOf(
         InvalidCredentialsError,
       );
-      await expect(auth.login({ ...credentials, email: 'nobody@boite.fr' })).rejects.toBeInstanceOf(
+      await expect(auth.login({ ...credentials, email: 'nobody@solem.fr' })).rejects.toBeInstanceOf(
         InvalidCredentialsError,
       );
     });

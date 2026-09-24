@@ -8,7 +8,7 @@ import request from 'supertest';
 
 // Parcours complet sur la vraie base (DATABASE_URL du conteneur back).
 describe('Auth (e2e)', () => {
-  const email = `e2e-${Date.now()}@boite.fr`;
+  const email = `e2e-${Date.now()}@solem.fr`;
   const account = { lastName: 'Dupont', firstName: 'Léa', email, password: '12345678' };
   let app: INestApplication;
   let db: Database;
@@ -30,6 +30,7 @@ describe('Auth (e2e)', () => {
 
     await http.post('/auth/signup').send(account).expect(201);
     await http.post('/auth/signup').send(account).expect(409);
+    await http.post('/auth/signup').send({ ...account, email: `e2e-${Date.now()}@gmail.com` }).expect(400);
     await http.post('/auth/login').send({ email, password: 'wrong-password' }).expect(401);
 
     const login = await http.post('/auth/login').send({ email, password: account.password }).expect(200);
@@ -42,12 +43,18 @@ describe('Auth (e2e)', () => {
     expect((await http.get('/auth/me').expect(200)).body.onboarded).toBe(true);
     await http.get('/roles').expect(403);
     await http.get('/users').expect(403);
+    await http.get('/email-domains').expect(403);
 
     await db.update(users).set({ role: 'super_admin' }).where(eq(users.email, email));
     const roles = await http.get('/roles').expect(200);
     expect(roles.body).toContainEqual({ role: 'user', permissions: ['profile.read', 'profile.complete_onboarding', 'events.read', 'events.participate'], editable: true });
     await http.put('/roles/super_admin').send({ permissions: [] }).expect(403);
     await http.put('/roles/user').send({ permissions: ['nope'] }).expect(400);
+
+    const domains = await http.get('/email-domains').expect(200);
+    expect(domains.body).toContainEqual({ id: expect.any(String), domain: 'solem.fr' });
+    await http.post('/email-domains').send({ domain: '@solem' }).expect(400);
+    await http.post('/email-domains').send({ domain: 'Solem.fr' }).expect(409);
 
     const list = await http.get('/users').expect(200);
     expect(list.body).toContainEqual(expect.objectContaining({ email, role: 'super_admin', extraPermissions: [] }));

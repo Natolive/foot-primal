@@ -9,7 +9,7 @@ import request from 'supertest';
 // Organisation puis inscriptions sur la vraie base, verrou compris.
 describe('Events (e2e)', () => {
   const stamp = Date.now();
-  const emails = ['orga', 'lea', 'max'].map((n) => `e2e-${n}-${stamp}@boite.fr`);
+  const emails = ['orga', 'lea', 'max'].map((n) => `e2e-${n}-${stamp}@solem.fr`);
   let app: INestApplication;
   let db: Database;
 

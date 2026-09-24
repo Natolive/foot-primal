@@ -13,7 +13,7 @@ describe('EventsService', () => {
     paymentUrl: null,
     description: null,
   });
-  const person = (firstName: string) => ({ email: `${firstName}@boite.fr`, firstName, lastName: 'Dupont', passwordHash: 'x' });
+  const person = (firstName: string) => ({ email: `${firstName}@solem.fr`, firstName, lastName: 'Dupont', passwordHash: 'x' });
   const yes = { attending: true };
   const no = { attending: false };
   let users: InMemoryUserRepository;
