@@ -1,0 +1,71 @@
+# Une seule image pour l'espace de travail npm (shared + backend + frontend).
+x-app: &app
+  build: .
+  volumes:
+    - .:/repo
+    - /repo/node_modules
+    - /repo/backend/node_modules
+    - /repo/frontend/node_modules
+
+services:
+  traefik:
+    image: traefik:latest
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --api.dashboard=true
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dashboard.rule=Host(`traefik.foot-primal.localhost`)
+      - traefik.http.routers.dashboard.service=api@internal
+
+  db:
+    image: postgres:latest
+    environment:
+      # ponytail: identifiants de dev en clair, passer par des secrets avant tout déploiement.
+      - POSTGRES_USER=primal
+      - POSTGRES_PASSWORD=primal
+      - POSTGRES_DB=primal
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U primal -d primal"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
+  backend:
+    <<: *app
+    working_dir: /repo/backend
+    command: sh -c "npm run db:migrate && npm run start:dev"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - CORS_ORIGIN=http://foot-primal.localhost
+      - DATABASE_URL=postgres://primal:primal@db:5432/primal
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.backend.rule=Host(`api.foot-primal.localhost`)
+      - traefik.http.services.backend.loadbalancer.server.port=3000
+
+  frontend:
+    <<: *app
+    working_dir: /repo/frontend
+    command: npm run dev -- --host 0.0.0.0
+    environment:
+      - NUXT_PUBLIC_API_URL=http://api.foot-primal.localhost
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.frontend.rule=Host(`foot-primal.localhost`)
+      - traefik.http.services.frontend.loadbalancer.server.port=3000
+
+volumes:
+  db-data:

@@ -1,0 +1,54 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+@theme static {
+  --font-sans: 'Archivo', sans-serif;
+  --font-display: 'Big Shoulders', sans-serif;
+
+
+  --color-chalk: #eef3ec;
+
+  /* Couleurs de marque, reprises du « A » du logo. */
+  --color-primal-50: #f1efff;
+  --color-primal-100: #e4e0ff;
+  --color-primal-200: #cbc3ff;
+  --color-primal-300: #a797ff;
+  --color-primal-400: #8466ff;
+  --color-primal-500: #6a3dff;
+  --color-primal-600: #5a22f5;
+  --color-primal-700: #4b16d6;
+  --color-primal-800: #3e14ad;
+  --color-primal-900: #34148a;
+  --color-primal-950: #1f0a56;
+  --color-brand-violet: #8a00f5;
+  --color-brand-blue: #3b28f6;
+  --color-brand-teal: #00d6c4;
+  --color-ink: #0f1729;
+}
+
+/* Tailwind v4 ne met plus de main sur les boutons : on la remet partout où l'on peut cliquer. */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [role="checkbox"],
+  [role="combobox"],
+  [role="option"],
+  [role="menuitem"],
+  [role="tab"],
+  label:has(input, button),
+  label[for] {
+    cursor: pointer;
+  }
+}
+
+/* Transition entre pages (le layout reste en place, seul le contenu glisse). */
+.page-enter-active,
+.page-leave-active {
+  transition: opacity .2s ease, transform .2s ease;
+}
+.page-enter-from { opacity: 0; transform: translateX(16px); }
+.page-leave-to { opacity: 0; transform: translateX(-16px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter-active, .page-leave-active { transition: none; }
+}

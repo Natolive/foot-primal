@@ -1,0 +1,9 @@
+import type { Role } from '@primal/shared';
+import { BaseRepository } from '../../common/domain/base.repository.js';
+import type { NewRolePermission, RolePermission } from './role-permission.entity.js';
+
+export abstract class RolePermissionRepository extends BaseRepository<RolePermission, NewRolePermission> {
+  abstract findByRole(role: Role): Promise<RolePermission[]>;
+  // Remplace d'un coup tous les droits enregistrés du rôle.
+  abstract replaceForRole(role: Role, rows: NewRolePermission[]): Promise<void>;
+}

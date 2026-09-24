@@ -1,0 +1,5 @@
+{
+  "name": "primal",
+  "private": true,
+  "workspaces": ["shared", "backend", "frontend"]
+}

@@ -1,0 +1,1 @@
+ALTER TYPE "public"."role" ADD VALUE 'admin' BEFORE 'super_admin';
