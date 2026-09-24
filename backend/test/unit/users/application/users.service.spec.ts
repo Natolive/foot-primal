@@ -63,4 +63,14 @@ describe('UsersService', () => {
       extraPermissions: ['users.read'],
     });
   });
+
+  it('deletes someone else, never oneself, and a super admin only by a super admin', async () => {
+    const manager = toPublicUser(await users.create(person('manager@solem.fr')));
+    const lea = await users.create(person('lea@solem.fr'));
+    const boss = await users.create({ ...person('boss@solem.fr'), role: 'super_admin' });
+    await expect(users.deleteUser(manager, manager.id)).rejects.toBeInstanceOf(OwnAccessLockedError);
+    await expect(users.deleteUser(manager, boss.id)).rejects.toBeInstanceOf(SuperAdminOnlyError);
+    await users.deleteUser(manager, lea.id);
+    expect((await users.findAll()).map((u) => u.email)).toEqual(['manager@solem.fr', 'boss@solem.fr']);
+  });
 });

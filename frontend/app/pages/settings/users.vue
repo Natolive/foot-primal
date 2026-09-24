@@ -43,6 +43,7 @@ const sections = (u: ManagedUserDto) => ({
   permissions: manageable(u) && u.id !== me.value?.id && can('users.update_permissions'),
 })
 const canEdit = (u: ManagedUserDto) => Object.values(sections(u)).some(Boolean)
+const canDelete = (u: ManagedUserDto) => manageable(u) && u.id !== me.value?.id && can('users.delete')
 
 const profileFields: FormFieldConfig<UpdateUserDto>[] = [
   { name: 'lastName', label: 'Nom', half: true },
@@ -94,6 +95,21 @@ async function save(path: string, method: 'PATCH' | 'PUT', body: object, title: 
   if (updated.id === me.value?.id) await fetchUser()
   toast.add({ title, description: `${updated.firstName} ${updated.lastName} est à jour.`, color: 'success', icon: 'i-lucide-check' })
 }
+
+const deleting = ref<ManagedUserDto>()
+
+async function confirmDelete() {
+  const target = deleting.value!
+  try {
+    await api(`/users/${target.id}`, { method: 'DELETE' })
+  } catch (e) {
+    toast.add({ title: 'Suppression impossible', description: apiErrorMessage(e), color: 'error', icon: 'i-lucide-circle-alert' })
+    return
+  }
+  users.value = users.value.filter((u) => u.id !== target.id)
+  deleting.value = undefined
+  toast.add({ title: 'Utilisateur supprimé', description: `${target.firstName} ${target.lastName} n’a plus de compte.`, color: 'success', icon: 'i-lucide-check' })
+}
 </script>
 
 <template>
@@ -123,14 +139,24 @@ async function save(path: string, method: 'PATCH' | 'PUT', body: object, title: 
         </div>
       </template>
       <template #actions-cell="{ row }">
-        <UButton
-          v-if="canEdit(row.original)"
-          icon="i-lucide-pencil"
-          color="neutral"
-          variant="ghost"
-          :aria-label="`Modifier ${row.original.firstName} ${row.original.lastName}`"
-          @click="edit(row.original)"
-        />
+        <div class="flex justify-end">
+          <UButton
+            v-if="canEdit(row.original)"
+            icon="i-lucide-pencil"
+            color="neutral"
+            variant="ghost"
+            :aria-label="`Modifier ${row.original.firstName} ${row.original.lastName}`"
+            @click="edit(row.original)"
+          />
+          <UButton
+            v-if="canDelete(row.original)"
+            icon="i-lucide-trash-2"
+            color="error"
+            variant="ghost"
+            :aria-label="`Supprimer ${row.original.firstName} ${row.original.lastName}`"
+            @click="deleting = row.original"
+          />
+        </div>
       </template>
     </UTable>
 
@@ -172,6 +198,20 @@ async function save(path: string, method: 'PATCH' | 'PUT', body: object, title: 
               submit-label="Enregistrer les droits"
             />
           </section>
+        </div>
+      </template>
+    </UModal>
+
+    <UModal
+      :open="!!deleting"
+      title="Supprimer l’utilisateur ?"
+      :description="`${deleting?.firstName} ${deleting?.lastName} perd son compte, ses réponses aux sondages et ses invités. Ses places se libèrent.`"
+      @update:open="(open) => !open && (deleting = undefined)"
+    >
+      <template #footer>
+        <div class="flex w-full justify-end gap-2">
+          <UButton color="neutral" variant="ghost" @click="deleting = undefined">Annuler</UButton>
+          <UButton color="error" icon="i-lucide-trash-2" loading-auto @click="confirmDelete">Supprimer l’utilisateur</UButton>
         </div>
       </template>
     </UModal>

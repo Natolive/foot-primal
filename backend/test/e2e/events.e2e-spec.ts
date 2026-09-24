@@ -67,7 +67,17 @@ describe('Events (e2e)', () => {
     await max.delete(`/events/${created.id}/guests/${withGuest.guests[0].id}`).expect(403);
     await lea.delete(`/events/${created.id}/guests/${withGuest.guests[0].id}`).expect(200);
     await answer(max, true).expect(200);
+
+    // Supprimer un compte efface ses votes et ses invités, ses places se libèrent.
+    await lea.post(`/events/${created.id}/guests`).send({ name: 'Paul' }).expect(409);
+    await answer(max, false).expect(200);
+    await lea.post(`/events/${created.id}/guests`).send({ name: 'Paul' }).expect(201);
+    const { body: leaMe } = await lea.get('/auth/me').expect(200);
+    await db.update(users).set({ role: 'super_admin' }).where(eq(users.email, emails[0]));
+    await orga.delete(`/users/${leaMe.id}`).expect(204);
+    const after = (await orga.get('/events').expect(200)).body.find((e: { id: string }) => e.id === created.id);
+    expect(after).toMatchObject({ participants: [], guests: [] });
+    expect(after.declined.map((p: { id: string }) => p.id)).not.toContain(leaMe.id);
     await orga.delete(`/events/${created.id}`).expect(204);
-    await lea.get('/events').expect(200);
   });
 });

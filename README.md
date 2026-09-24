@@ -81,6 +81,8 @@ Tests back : `docker compose exec backend npm test` (unitaires), `docker compose
 - Mot de passe oublié : lien valable 1 h (`/reset-password?token=…`) ; le nouveau mot de passe déconnecte toutes les
   sessions, connecte, et confirme l'email si ce n'était pas fait. Même réponse que le compte existe ou non.
 - La liste des utilisateurs (`/settings/users`) montre si l'email est confirmé (`ManagedUserDto.emailVerified`).
+- Supprimer un utilisateur (droit `users.delete`) efface aussi ses sessions, ses réponses et ses invités (cascade) ;
+  jamais soi-même, et un super admin seulement par un super admin.
 - Jetons des liens stockés hachés (SHA-256), à usage unique ; un nouveau lien remplace le précédent.
 - Limites par route (`@RateLimit`, en mémoire, 429 au-delà) :
 

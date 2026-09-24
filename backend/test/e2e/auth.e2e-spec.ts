@@ -72,6 +72,7 @@ describe('Auth (e2e)', () => {
     expect(list.body).toContainEqual(expect.objectContaining({ email, role: 'super_admin', extraPermissions: [], emailVerified: true }));
     await http.put(`/users/${me.body.id}/role`).send({ role: 'user' }).expect(403);
     await http.patch(`/users/${me.body.id}`).send({ email, firstName: 'Léo', lastName: 'Dupont' }).expect(200);
+    await http.delete(`/users/${me.body.id}`).expect(403);
 
     await http.post('/auth/logout').expect(204);
     await http.get('/auth/me').expect(401);

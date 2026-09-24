@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, ParseUUIDPipe, Patch, Put } from '@nestjs/common';
 import {
   updateUserPermissionsSchema,
   updateUserRoleSchema,
@@ -51,5 +51,12 @@ export class UsersController {
     @Body(new ZodValidationPipe(updateUserPermissionsSchema)) dto: UpdateUserPermissionsDto,
   ): Promise<ManagedUserDto> {
     return this.users.updatePermissions(actor, id, dto);
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  @Authorize('users.delete')
+  delete(@CurrentUser() actor: UserDto, @Param('id', ParseUUIDPipe) id: string): Promise<void> {
+    return this.users.deleteUser(actor, id);
   }
 }

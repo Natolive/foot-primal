@@ -61,6 +61,12 @@ export class UsersService extends BaseService<User, NewUser> {
     return toManagedUser(await this.update(id, { extraPermissions }));
   }
 
+  // Ses réponses, ses invités et ses sessions partent avec lui (cascade en base).
+  async deleteUser(actor: PublicUser, id: string): Promise<void> {
+    await this.findManageable(actor, id, { self: false });
+    await this.delete(id);
+  }
+
   // Seul un super admin touche à un super admin ; son propre accès ne se modifie pas
   // (évite de se retirer l'administration par erreur, ou de s'accorder plus de droits).
   private async findManageable(actor: PublicUser, id: string, { self = true } = {}): Promise<User> {
