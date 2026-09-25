@@ -21,5 +21,5 @@
 - Par défaut `user` a tout sauf les catégories d'administration (`ADMIN_CATEGORIES` : `roles`, `users`, `planning`, `email_domains`) ; une catégorie d'admin nouvelle va dans cette liste.
 - `role_permissions` ne stocke que ce qu'un admin a modifié ; sans ligne, le défaut du code s'applique (nouveau droit = pas de migration).
 - Droit supprimé ou renommé = migration qui nettoie `role_permissions` et `users.extra_permissions`.
-- Règles vérifiées côté API et reprises à l'écran : seul un super admin touche à un super admin ; personne ne modifie son propre rôle ni ses droits.
+- Règles vérifiées côté API et reprises à l'écran : seul un super admin touche à un super admin ; personne ne modifie son propre rôle ni ses droits, ni ne supprime son propre compte.
 - Premier super admin : `UPDATE users SET role = 'super_admin' WHERE email = '…'` (pas d'écran).

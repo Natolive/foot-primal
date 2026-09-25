@@ -40,7 +40,7 @@ frontend/   Nuxt 4
   app/composables/       useApi, useAuth, useOnboardingTour (visite guidée driver.js)
   app/layouts/           default (navbar), auth (bandeau de marque sur grand écran + formulaire)
   app/pages/             index (créneaux), login, signup, verify-email, forgot-password, reset-password,
-                         settings/ : users (administration), roles (droits des rôles),
+                         settings/ : users (liste, modification, suppression), roles (droits des rôles),
                          email-domains (domaines autorisés à créer un compte)
   app/utils/             permissionGroups (droits groupés par catégorie)
   app/types/
