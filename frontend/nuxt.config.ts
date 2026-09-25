@@ -8,10 +8,12 @@ export default defineNuxtConfig({
     pageTransition: { name: 'page', mode: 'out-in' },
     head: {
       link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
-      meta: [{ name: 'theme-color', content: '#2d4bff' }],
+      meta: [{ name: 'theme-color', content: '#15803d' }],
     },
   },
   modules: ['@nuxt/ui'],
+  // Vert et blanc uniquement : pas de mode sombre.
+  ui: { colorMode: false },
   css: ['~/assets/css/main.css'],
   fonts: {
     families: [

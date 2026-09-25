@@ -1,4 +1,4 @@
-import type { ManagedUserDto, Permission, Role } from '@footix/shared';
+import type { ManagedUserDto, Permission, Role, Weekday } from '@footix/shared';
 
 export interface User {
   id: string;
@@ -8,6 +8,7 @@ export interface User {
   passwordHash: string;
   role: Role;
   extraPermissions: Permission[];
+  availableDays: Weekday[];
   onboardedAt: Date | null;
   emailVerifiedAt: Date | null;
   emailVerificationTokenHash: string | null;
@@ -17,10 +18,11 @@ export interface User {
   createdAt: Date;
 }
 
-// Facultatifs à la création : `user`, aucun droit en plus et null par défaut en base.
+// Facultatifs à la création : `user`, aucun droit en plus, aucune dispo et null par défaut en base.
 type Defaulted =
   | 'role'
   | 'extraPermissions'
+  | 'availableDays'
   | 'onboardedAt'
   | 'emailVerifiedAt'
   | 'emailVerificationTokenHash'

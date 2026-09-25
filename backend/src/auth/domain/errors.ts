@@ -42,3 +42,9 @@ export class InvalidResetLinkError extends NotFoundError {
     super('Lien de réinitialisation invalide, expiré ou déjà utilisé : redemande un lien depuis « Mot de passe oublié ».');
   }
 }
+
+export class WrongCurrentPasswordError extends UnauthorizedError {
+  constructor() {
+    super("Ce n'est pas ton mot de passe actuel : ressaisis-le, ou passe par « Mot de passe oublié » depuis la connexion.");
+  }
+}

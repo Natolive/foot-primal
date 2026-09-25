@@ -1,3 +1,4 @@
+import { updateAvailabilitySchema, type SignupDto } from '@footix/shared';
 import { AuthService, SESSION_TTL } from '@src/auth/application/auth.service.js';
 import {
   EmailNotVerifiedError,
@@ -7,6 +8,7 @@ import {
   MissingPermissionError,
   SessionExpiredError,
   VerificationPasswordMismatchError,
+  WrongCurrentPasswordError,
 } from '@src/auth/domain/errors.js';
 import { EmailDomainsService } from '@src/email-domains/application/email-domains.service.js';
 import { EmailDomainNotAllowedError } from '@src/email-domains/domain/errors.js';
@@ -21,7 +23,7 @@ import { InMemorySessionRepository } from '@test/fakes/in-memory-session.reposit
 import { InMemoryUserRepository } from '@test/fakes/in-memory-user.repository.js';
 
 describe('AuthService', () => {
-  const dto = { lastName: 'Dupont', firstName: 'Léa', email: 'lea@solem.fr', password: '12345678' };
+  const dto: SignupDto = { lastName: 'Dupont', firstName: 'Léa', email: 'lea@solem.fr', password: '12345678', availableDays: ['thursday'] };
   const credentials = { email: dto.email, password: dto.password };
   let users: InMemoryUserRepository;
   let sessions: InMemorySessionRepository;
@@ -51,6 +53,10 @@ describe('AuthService', () => {
       const user = await auth.signup(dto);
       expect(user).not.toHaveProperty('passwordHash');
       expect(users.rows[0].passwordHash).toBe('hashed:12345678');
+    });
+
+    it('saves the available days given at signup', async () => {
+      expect((await auth.signup(dto)).availableDays).toEqual(['thursday']);
     });
 
     it('rejects an email already confirmed', async () => {
@@ -191,10 +197,40 @@ describe('AuthService', () => {
     });
   });
 
+  describe('profile', () => {
+    const loggedIn = async () => {
+      await auth.signup(dto);
+      await confirm();
+      return auth.login(credentials);
+    };
+
+    it('changes the name, never the email', async () => {
+      const { user } = await loggedIn();
+      expect(await auth.updateProfile(user, { firstName: 'Léna', lastName: 'Martin' })).toMatchObject({ firstName: 'Léna', lastName: 'Martin', email: dto.email });
+    });
+
+    it('saves the available days, in week order and without duplicates', async () => {
+      const { user } = await loggedIn();
+      const availableDays = updateAvailabilitySchema.parse({ availableDays: ['friday', 'monday', 'friday'] }).availableDays;
+      expect((await auth.updateAvailability(user, { availableDays })).availableDays).toEqual(['monday', 'friday']);
+    });
+
+    it('asks for the current password, then logs out the other sessions only', async () => {
+      const here = await loggedIn();
+      const elsewhere = await auth.login(credentials);
+      await expect(auth.changePassword(here.user, here.token, { currentPassword: 'wrong', password: 'new-password' })).rejects.toBeInstanceOf(WrongCurrentPasswordError);
+      await auth.changePassword(here.user, here.token, { currentPassword: dto.password, password: 'new-password' });
+      await expect(auth.authenticate(here.token)).resolves.toMatchObject({ email: dto.email });
+      await expect(auth.authenticate(elsewhere.token)).rejects.toBeInstanceOf(SessionExpiredError);
+      await expect(auth.login(credentials)).rejects.toBeInstanceOf(InvalidCredentialsError);
+      await auth.login({ ...credentials, password: 'new-password' });
+    });
+  });
+
   describe('authorize', () => {
     it('checks the effective permissions of the role', async () => {
       const user = await auth.signup(dto);
-      expect(user).toMatchObject({ role: 'user', permissions: ['profile.read', 'profile.complete_onboarding', 'events.read', 'events.participate', 'events.invite_guest'] });
+      expect(user).toMatchObject({ role: 'user', permissions: ['profile.read', 'profile.update', 'profile.change_password', 'profile.update_availability', 'profile.complete_onboarding', 'events.read', 'events.participate', 'events.invite_guest'] });
       expect(() => auth.authorize(user, 'profile.read')).not.toThrow();
       expect(() => auth.authorize(user, 'roles.update')).toThrow(MissingPermissionError);
     });
@@ -204,7 +240,7 @@ describe('AuthService', () => {
       await confirm();
       users.rows[0].extraPermissions = ['users.read'];
       const { token } = await auth.login(credentials);
-      expect((await auth.authenticate(token)).permissions).toEqual(['profile.read', 'profile.complete_onboarding', 'users.read', 'events.read', 'events.participate', 'events.invite_guest']);
+      expect((await auth.authenticate(token)).permissions).toEqual(['profile.read', 'profile.update', 'profile.change_password', 'profile.update_availability', 'profile.complete_onboarding', 'users.read', 'events.read', 'events.participate', 'events.invite_guest']);
     });
   });
 });

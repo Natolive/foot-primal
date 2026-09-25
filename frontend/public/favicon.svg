@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!-- « f » du logo en blanc sur le bleu Footix, le ballon en point final. -->
-  <rect width="64" height="64" rx="16" fill="#2d4bff" />
+  <!-- « f » du logo en blanc sur le vert Footix, le ballon en point final. -->
+  <rect width="64" height="64" rx="16" fill="#15803d" />
   <path d="M25 52 V25 A11 11 0 0 1 36 14 H38 M17 30 H36" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
   <circle cx="45" cy="44" r="6.5" fill="#ff5a36" />
 </svg>

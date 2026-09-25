@@ -117,7 +117,7 @@ async function confirmDelete() {
     <h1 class="font-display text-highlighted text-4xl font-bold tracking-tight leading-[1.05] sm:text-5xl">Utilisateurs</h1>
     <p class="text-muted mt-3">Modifie une personne, change son rôle ou ajoute-lui des droits.</p>
 
-    <UTable :data="users" :columns="columns" class="mt-10">
+    <UTable :data="users" :columns="columns" class="bg-default border-default mt-10 rounded-lg border">
       <template #name-cell="{ row }">
         <span class="text-highlighted font-medium">{{ row.original.firstName }} {{ row.original.lastName }}</span>
       </template>
@@ -135,7 +135,7 @@ async function confirmDelete() {
           <UBadge v-for="p in row.original.extraPermissions" :key="p" color="neutral" variant="outline">
             {{ PERMISSION_LABELS[p] }}
           </UBadge>
-          <span v-if="!row.original.extraPermissions.length" class="text-dimmed">Aucun</span>
+          <span v-if="!row.original.extraPermissions.length" class="text-muted">Aucun</span>
         </div>
       </template>
       <template #actions-cell="{ row }">

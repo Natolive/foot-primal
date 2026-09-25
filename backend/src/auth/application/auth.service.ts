@@ -1,11 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import {
   PERMISSIONS,
+  type ChangePasswordDto,
   type LoginDto,
   type Permission,
   type ResetPasswordDto,
   type SignupDto,
+  type UpdateAvailabilityDto,
+  type UpdateProfileDto,
   type VerifyEmailDto,
+  type Weekday,
 } from '@footix/shared';
 import { createHash, randomBytes } from 'node:crypto';
 import { emailVerificationMail } from '../../mail/application/templates/email-verification.mail.js';
@@ -24,6 +28,7 @@ import {
   MissingPermissionError,
   SessionExpiredError,
   VerificationPasswordMismatchError,
+  WrongCurrentPasswordError,
 } from '../domain/errors.js';
 import { PasswordHasher } from '../domain/password-hasher.js';
 import { SessionRepository } from '../domain/session.repository.js';
@@ -34,7 +39,7 @@ export const EMAIL_VERIFICATION_TTL = 48 * HOUR;
 export const PASSWORD_RESET_TTL = HOUR;
 
 // Utilisateur renvoyé au front, avec ses droits effectifs : ceux du rôle plus ceux ajoutés à la personne.
-export type AuthenticatedUser = PublicUser & { onboarded: boolean; permissions: Permission[] };
+export type AuthenticatedUser = PublicUser & { onboarded: boolean; availableDays: Weekday[]; permissions: Permission[] };
 
 export interface OpenedSession {
   token: string;
@@ -154,6 +159,22 @@ export class AuthService {
     return this.users.completeOnboarding(user.id);
   }
 
+  async updateProfile(user: AuthenticatedUser, dto: UpdateProfileDto): Promise<AuthenticatedUser> {
+    return this.withPermissions(await this.users.update(user.id, dto));
+  }
+
+  async updateAvailability(user: AuthenticatedUser, { availableDays }: UpdateAvailabilityDto): Promise<AuthenticatedUser> {
+    return this.withPermissions(await this.users.update(user.id, { availableDays }));
+  }
+
+  // Déconnecte les autres sessions (mot de passe peut-être compromis), garde celle qui fait la demande.
+  async changePassword(user: AuthenticatedUser, token: string | undefined, { currentPassword, password }: ChangePasswordDto): Promise<void> {
+    const { passwordHash } = await this.users.findById(user.id);
+    if (!(await this.hasher.verify(currentPassword, passwordHash))) throw new WrongCurrentPasswordError();
+    await this.users.update(user.id, { passwordHash: await this.hasher.hash(password) });
+    await this.sessions.deleteByUserId(user.id, token && hashToken(token));
+  }
+
   async logout(token: string | undefined): Promise<void> {
     if (token) await this.sessions.deleteByTokenHash(hashToken(token));
   }
@@ -161,6 +182,6 @@ export class AuthService {
   private async withPermissions(user: User): Promise<AuthenticatedUser> {
     const fromRole = await this.roles.permissionsOf(user.role);
     const permissions = PERMISSIONS.filter((p) => fromRole.includes(p) || user.extraPermissions.includes(p));
-    return { ...toPublicUser(user), onboarded: user.onboardedAt !== null, permissions };
+    return { ...toPublicUser(user), onboarded: user.onboardedAt !== null, availableDays: user.availableDays, permissions };
   }
 }

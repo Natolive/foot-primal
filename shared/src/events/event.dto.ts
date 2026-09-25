@@ -20,6 +20,7 @@ export interface EventDto {
   description: string | null
   location: string
   startsAt: string
+  durationMinutes: number
   maxParticipants: number
   paymentUrl: string | null
   // Ceux qui viennent, seuls à prendre une place.
@@ -38,6 +39,11 @@ export const eventSchema = z.object({
   location: z.string('Indique le lieu.').trim().min(1, 'Indique le lieu, par exemple « Urban Soccer Lyon ».').max(200, 'Raccourcis le lieu à 200 caractères.'),
   // Date envoyée en ISO par le front (le champ datetime-local est converti dans le fuseau du navigateur).
   startsAt: z.coerce.date('Choisis la date et l’heure du match.').refine((d) => d > new Date(), 'Choisis une date à venir.'),
+  durationMinutes: z.coerce
+    .number('Indique la durée du match.')
+    .int('Indique une durée en minutes entières.')
+    .min(15, 'Prévois au moins 15 minutes.')
+    .max(480, 'Limite la durée à 8 h (480 minutes).'),
   maxParticipants: z.coerce
     .number('Indique le nombre de places.')
     .int('Indique un nombre de places entier.')

@@ -1,4 +1,4 @@
-import { ROLES, type Permission } from '@footix/shared';
+import { ROLES, type Permission, type Weekday } from '@footix/shared';
 import { sql } from 'drizzle-orm';
 import { pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
@@ -13,6 +13,8 @@ export const users = pgTable('users', {
   role: role().notNull().default('user'),
   // Droits accordés en plus de ceux du rôle ; texte et non enum, comme dans role_permissions.
   extraPermissions: text('extra_permissions').array().$type<Permission[]>().notNull().default(sql`'{}'`),
+  // Jours où la personne peut jouer ; texte et non enum, comme les droits.
+  availableDays: text('available_days').array().$type<Weekday[]>().notNull().default(sql`'{}'`),
   // Visite guidée affichée ; null tant qu'elle ne l'a pas été.
   onboardedAt: timestamp('onboarded_at', { withTimezone: true }),
   // Email confirmé par le lien reçu à l'inscription ; null tant que ce n'est pas fait (connexion refusée).

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { signupSchema } from '../auth/signup.dto.ts'
+import { accountSchema } from '../auth/signup.dto.ts'
 import { PERMISSIONS, ROLES, type Permission, type Role } from '../roles/permissions.ts'
 
 // Utilisateur vu depuis l'administration : son rôle et les droits ajoutés à ceux du rôle.
@@ -14,7 +14,7 @@ export interface ManagedUserDto {
 }
 
 // Un schéma par droit : chacun se modifie séparément.
-export const updateUserSchema = signupSchema.omit({ password: true })
+export const updateUserSchema = accountSchema.omit({ password: true })
 export type UpdateUserDto = z.infer<typeof updateUserSchema>
 
 export const updateUserRoleSchema = z.object({

@@ -88,6 +88,7 @@ const shaking = ref(false)
             :autocomplete="field.autocomplete"
             :placeholder="field.placeholder"
             :icon="field.icon"
+            :disabled="field.disabled"
             size="xl"
             class="w-full"
           />

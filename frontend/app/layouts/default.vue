@@ -23,6 +23,7 @@ const fullName = computed(() => `${user.value?.firstName ?? ''} ${user.value?.la
 
 const menu = computed<DropdownMenuItem[][]>(() => [
   [{ type: 'label', label: fullName.value, description: user.value?.email }],
+  [{ label: 'Mon profil', icon: 'i-lucide-user-round', to: '/profile' }],
   [{ label: 'Se déconnecter', icon: 'i-lucide-log-out', color: 'error', onSelect: onLogout }],
 ])
 </script>
@@ -49,6 +50,19 @@ const menu = computed<DropdownMenuItem[][]>(() => [
           >
             <span class="hidden sm:inline">Créneaux</span>
           </UButton>
+          <UButton
+            v-if="user?.permissions.includes('planning.read_availability')"
+            to="/availability"
+            icon="i-lucide-calendar-check"
+            aria-label="Dispos"
+            color="neutral"
+            variant="ghost"
+            class="font-medium"
+            active-class="text-highlighted bg-elevated"
+            inactive-class="text-muted"
+          >
+            <span class="hidden sm:inline">Dispos</span>
+          </UButton>
           <UDropdownMenu v-if="settings.length" :items="settings">
             <UButton
               icon="i-lucide-settings"
@@ -66,6 +80,7 @@ const menu = computed<DropdownMenuItem[][]>(() => [
 
         <UDropdownMenu :items="menu" :content="{ align: 'end' }">
           <UButton
+            data-tour="account"
             color="neutral"
             variant="ghost"
             trailing-icon="i-lucide-chevron-down"

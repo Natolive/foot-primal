@@ -4,5 +4,6 @@ import type { NewSession, Session } from './session.entity.js';
 export abstract class SessionRepository extends BaseRepository<Session, NewSession> {
   abstract findValidByTokenHash(tokenHash: string, now: Date): Promise<Session | null>;
   abstract deleteByTokenHash(tokenHash: string): Promise<void>;
-  abstract deleteByUserId(userId: string): Promise<void>;
+  // `exceptTokenHash` : garde cette session (celle qui fait la demande).
+  abstract deleteByUserId(userId: string, exceptTokenHash?: string): Promise<void>;
 }

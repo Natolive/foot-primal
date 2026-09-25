@@ -20,6 +20,17 @@ describe('UsersService', () => {
     expect((await users.findById(lea.id)).onboardedAt).toBe(first);
   });
 
+  it('lists who can play each day, confirmed accounts only, sorted by name', async () => {
+    await users.create({ ...person('lea@solem.fr'), emailVerifiedAt: new Date(), availableDays: ['monday', 'thursday'] });
+    await users.create({ ...person('max@solem.fr'), lastName: 'Allard', emailVerifiedAt: new Date(), availableDays: ['thursday'] });
+    await users.create({ ...person('new@solem.fr'), availableDays: ['thursday'] });
+    const days = await users.findAvailability();
+    expect(days.map((d) => d.day)).toEqual(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']);
+    expect(days.find((d) => d.day === 'monday')!.people.map((p) => p.lastName)).toEqual(['Dupont']);
+    expect(days.find((d) => d.day === 'thursday')!.people.map((p) => p.lastName)).toEqual(['Allard', 'Dupont']);
+    expect(days.find((d) => d.day === 'friday')!.people).toEqual([]);
+  });
+
   it('updates the profile, role and extra permissions of someone else, one at a time', async () => {
     const admin = toPublicUser(await users.create({ ...person('admin@solem.fr'), role: 'super_admin' }));
     const lea = await users.create(person('lea@solem.fr'));

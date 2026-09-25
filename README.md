@@ -21,7 +21,8 @@ shared/     @footix/shared : schémas Zod + types (DTO) partagés front/back
   src/common/   champs réutilisables (email, règles mot de passe)
   src/auth/     login, signup, verify-email, password-reset (.dto.ts)
   src/roles/    permissions.ts (droits, rôles, défauts), role.dto.ts
-  src/users/    user.dto.ts, managed-user.dto.ts
+  src/users/    user.dto.ts, managed-user.dto.ts, profile.dto.ts (son nom, son mot de passe),
+                availability.dto.ts (jours de la semaine où l'on peut jouer)
   src/events/   event.dto.ts (créneau, réponse au sondage, invité)
   src/email-domains/ email-domain.dto.ts (domaine autorisé à créer un compte)
 backend/    NestJS
@@ -39,10 +40,12 @@ frontend/   Nuxt 4
   app/components/form/   FormBuilder (formulaire généré depuis une liste de champs + schéma)
   app/composables/       useApi, useAuth, useOnboardingTour (visite guidée driver.js)
   app/layouts/           default (navbar), auth (bandeau de marque sur grand écran + formulaire)
-  app/pages/             index (créneaux), login, signup, verify-email, forgot-password, reset-password,
+  app/pages/             index (créneaux), profile (son nom, ses dispos, son mot de passe),
+                         availability (dispos des joueurs par jour, pour les organisateurs),
+                         login, signup, verify-email, forgot-password, reset-password,
                          settings/ : users (liste, modification, suppression), roles (droits des rôles),
                          email-domains (domaines autorisés à créer un compte)
-  app/utils/             permissionGroups (droits groupés par catégorie)
+  app/utils/             permissionGroups (droits groupés par catégorie), weekdayGroups (cases des dispos)
   app/types/
 ```
 
@@ -54,16 +57,21 @@ Tests back : `docker compose exec backend npm test` (unitaires), `docker compose
 
 ## Créneaux
 
-- Un organisateur crée un créneau : titre, date et heure, lieu, nombre de places, lien de paiement et infos facultatifs.
+- Un organisateur crée un créneau : titre, date et heure, durée (minutes, 60 par défaut), lieu, nombre de places,
+  lien de paiement et infos facultatifs. La carte affiche l'heure de début et de fin.
 - Chacun répond au sondage « je viens » / « je ne viens pas » jusqu'au début du match ; seuls les « je viens » prennent une place.
 - Qui vient peut ramener des invités sans compte (juste un nom, droit `events.invite_guest`) : chacun prend une place.
   Répondre « je ne viens pas » retire ses invités ; on retire les siens, un organisateur (`planning.update_event`)
   retire ceux de tout le monde. Plus d'ajout ni de retrait une fois le match commencé.
-- Le premier « je viens » qui prend une place envoie un email de confirmation avec le match en `.ics` (durée fixe 1 h) :
+- Le premier « je viens » qui prend une place envoie un email de confirmation avec le match en `.ics` (fin = début + durée) :
   un seul par personne et par créneau (`event_participants.confirmation_sent_at`), même si elle change d'avis.
   Un échec d'envoi est loggé sans annuler l'inscription.
 - Se désinscrire passe par une modal de confirmation (qui liste ses invités, libérés avec soi) ; recliquer sur
   la réponse déjà donnée ne fait rien.
+- Dispos : à l'inscription puis dans son profil, chacun coche les jours de la semaine où il peut jouer (`PUT /auth/me/availability`,
+  droit `profile.update_availability`, `users.available_days`). Les organisateurs voient qui est dispo chaque jour
+  dans l'onglet Dispos de la barre de navigation (`/availability`, `GET /users/availability`,
+  droit `planning.read_availability`), comptes confirmés seulement.
 - Rôles : `user` répond aux sondages et ramène des invités, `admin` organise aussi les créneaux (catégorie de droits `planning`), `super_admin` a tout.
   Premier super admin : `UPDATE users SET role = 'super_admin' WHERE email = '…'`.
 
@@ -80,13 +88,18 @@ Tests back : `docker compose exec backend npm test` (unitaires), `docker compose
 
 ## Comptes
 
-- Inscription : réservée aux domaines email autorisés, envoie un lien de confirmation (`/verify-email?token=…`,
+- Inscription en deux étapes : le compte (prénom, nom, email, mot de passe), puis ses dispos (facultatives),
+  envoyés ensemble à la fin. Réservée aux domaines email autorisés, envoie un lien de confirmation (`/verify-email?token=…`,
   valable 48 h) ; connexion refusée (403) tant que l'email n'est pas confirmé.
 - La page du lien redemande le mot de passe de l'inscription, puis connecte : un tiers qui s'inscrit avec l'email
   d'un collègue ne peut pas récupérer le compte, même si le collègue ouvre le lien.
 - Se réinscrire avec un email pas encore confirmé remplace le compte et renvoie un lien (faute de frappe, lien perdu).
 - Mot de passe oublié : lien valable 1 h (`/reset-password?token=…`) ; le nouveau mot de passe déconnecte toutes les
   sessions, connecte, et confirme l'email si ce n'était pas fait. Même réponse que le compte existe ou non.
+- Mon profil (`/profile`, menu du compte) : chacun modifie son nom et son prénom, ses dispos (voir Créneaux) (`PATCH /auth/me`, droit
+  `profile.update`) et change son mot de passe en redonnant l'actuel (`POST /auth/me/password`, droit
+  `profile.change_password`, 10 essais / 15 min par IP) ; ses autres sessions sont déconnectées, pas celle-ci.
+  L'email ne se change pas.
 - La liste des utilisateurs (`/settings/users`) montre si l'email est confirmé (`ManagedUserDto.emailVerified`).
 - Supprimer un utilisateur (droit `users.delete`) efface aussi ses sessions, ses réponses et ses invités (cascade) ;
   jamais soi-même, et un super admin seulement par un super admin.
@@ -98,13 +111,15 @@ Tests back : `docker compose exec backend npm test` (unitaires), `docker compose
   | `signup`, `forgot-password` | 3 / h | 30 / h |
   | `login` | 10 / 15 min | 50 / 15 min |
   | `verify-email`, `reset-password` | — | 20 / 15 min |
+  | `me/password` | — | 10 / 15 min |
 
   IP lue dans `X-Forwarded-For` (`trust proxy`) : l'API ne doit jamais être exposée sans Caddy ou Traefik devant.
 
 ## Visite guidée
 
 - À la première connexion (après la confirmation de l'email), la personne arrive sur les créneaux, où une visite
-  guidée (driver.js) montre un créneau, le sondage et le lien de paiement.
+  guidée (driver.js) montre un créneau, le sondage, le lien de paiement, puis le menu du compte pour renseigner
+  ses dispos dans « Mon profil ».
 - Elle s'affiche une seule fois par compte : `POST /auth/me/onboarding` (droit `profile.complete_onboarding`) remplit
   `users.onboarded_at` dès l'affichage, renvoyé dans `UserDto.onboarded`.
 - Le temps de la visite, un créneau d'exemple non cliquable est affiché en tête de liste, même sans vrai créneau.

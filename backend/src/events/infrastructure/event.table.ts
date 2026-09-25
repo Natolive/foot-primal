@@ -7,6 +7,7 @@ export const events = pgTable('events', {
   description: text(),
   location: text().notNull(),
   startsAt: timestamp('starts_at', { withTimezone: true }).notNull(),
+  durationMinutes: integer('duration_minutes').notNull().default(60),
   maxParticipants: integer('max_participants').notNull(),
   paymentUrl: text('payment_url'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),

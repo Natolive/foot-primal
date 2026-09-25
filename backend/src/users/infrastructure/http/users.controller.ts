@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, ParseUUIDPipe, Patch, Put } from '@nestjs/common';
 import {
+  type DayAvailabilityDto,
   updateUserPermissionsSchema,
   updateUserRoleSchema,
   updateUserSchema,
@@ -21,6 +22,12 @@ export class UsersController {
   @Authorize('users.read')
   findAll(): Promise<ManagedUserDto[]> {
     return this.users.findAllManaged();
+  }
+
+  @Get('availability')
+  @Authorize('planning.read_availability')
+  findAvailability(): Promise<DayAvailabilityDto[]> {
+    return this.users.findAvailability();
   }
 
   @Patch(':id')

@@ -49,17 +49,26 @@ describe('Auth (e2e)', () => {
     expect(login.headers['set-cookie']?.[0]).toMatch(/footix_session=.+HttpOnly/);
 
     const me = await http.get('/auth/me').expect(200);
-    expect(me.body).toEqual({ id: expect.any(String), email, firstName: 'Léa', lastName: 'Dupont', role: 'user', onboarded: false, permissions: ['profile.read', 'profile.complete_onboarding', 'events.read', 'events.participate', 'events.invite_guest'] });
+    expect(me.body).toEqual({ id: expect.any(String), email, firstName: 'Léa', lastName: 'Dupont', role: 'user', onboarded: false, availableDays: [], permissions: ['profile.read', 'profile.update', 'profile.change_password', 'profile.update_availability', 'profile.complete_onboarding', 'events.read', 'events.participate', 'events.invite_guest'] });
 
     await http.post('/auth/me/onboarding').expect(204);
     expect((await http.get('/auth/me').expect(200)).body.onboarded).toBe(true);
+    const renamed = await http.patch('/auth/me').send({ firstName: 'Léna', lastName: 'Martin', email: 'autre@solem.fr' }).expect(200);
+    expect(renamed.body).toMatchObject({ firstName: 'Léna', lastName: 'Martin', email });
+    await http.post('/auth/me/password').send({ currentPassword: 'wrong-password', password: 'new-password' }).expect(401);
+    await http.post('/auth/me/password').send({ currentPassword: account.password, password: 'new-password' }).expect(204);
+    await http.post('/auth/me/password').send({ currentPassword: 'new-password', password: account.password }).expect(204);
+    await http.get('/auth/me').expect(200);
+    await http.put('/auth/me/availability').send({ availableDays: ['someday'] }).expect(400);
+    expect((await http.put('/auth/me/availability').send({ availableDays: ['thursday', 'monday'] }).expect(200)).body.availableDays).toEqual(['monday', 'thursday']);
+    await http.get('/users/availability').expect(403);
     await http.get('/roles').expect(403);
     await http.get('/users').expect(403);
     await http.get('/email-domains').expect(403);
 
     await db.update(users).set({ role: 'super_admin' }).where(eq(users.email, email));
     const roles = await http.get('/roles').expect(200);
-    expect(roles.body).toContainEqual({ role: 'user', permissions: ['profile.read', 'profile.complete_onboarding', 'events.read', 'events.participate', 'events.invite_guest'], editable: true });
+    expect(roles.body).toContainEqual({ role: 'user', permissions: ['profile.read', 'profile.update', 'profile.change_password', 'profile.update_availability', 'profile.complete_onboarding', 'events.read', 'events.participate', 'events.invite_guest'], editable: true });
     await http.put('/roles/super_admin').send({ permissions: [] }).expect(403);
     await http.put('/roles/user').send({ permissions: ['nope'] }).expect(400);
 
@@ -68,6 +77,8 @@ describe('Auth (e2e)', () => {
     await http.post('/email-domains').send({ domain: '@solem' }).expect(400);
     await http.post('/email-domains').send({ domain: 'Solem.fr' }).expect(409);
 
+    const availability = await http.get('/users/availability').expect(200);
+    expect(availability.body.find((d: { day: string }) => d.day === 'monday').people).toContainEqual({ id: me.body.id, firstName: 'Léna', lastName: 'Martin' });
     const list = await http.get('/users').expect(200);
     expect(list.body).toContainEqual(expect.objectContaining({ email, role: 'super_admin', extraPermissions: [], emailVerified: true }));
     await http.put(`/users/${me.body.id}/role`).send({ role: 'user' }).expect(403);

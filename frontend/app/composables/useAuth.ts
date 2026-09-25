@@ -1,4 +1,4 @@
-import type { ForgotPasswordDto, LoginDto, ResetPasswordDto, UserDto, VerifyEmailDto } from '@footix/shared'
+import type { ChangePasswordDto, ForgotPasswordDto, LoginDto, ResetPasswordDto, UpdateAvailabilityDto, UpdateProfileDto, UserDto, VerifyEmailDto } from '@footix/shared'
 
 export const useAuth = () => {
   // undefined : session pas encore vérifiée ; null : pas connecté.
@@ -28,10 +28,23 @@ export const useAuth = () => {
     user.value = await api<UserDto>('/auth/reset-password', { method: 'POST', body: dto })
   }
 
+  async function updateProfile(dto: UpdateProfileDto) {
+    user.value = await api<UserDto>('/auth/me', { method: 'PATCH', body: dto })
+  }
+
+  async function updateAvailability(dto: UpdateAvailabilityDto) {
+    user.value = await api<UserDto>('/auth/me/availability', { method: 'PUT', body: dto })
+  }
+
+  // Garde cette session, déconnecte les autres.
+  async function changePassword(dto: ChangePasswordDto) {
+    await api('/auth/me/password', { method: 'POST', body: dto })
+  }
+
   async function logout() {
     await api('/auth/logout', { method: 'POST' })
     user.value = null
   }
 
-  return { user, fetchUser, login, verifyEmail, forgotPassword, resetPassword, logout }
+  return { user, fetchUser, login, verifyEmail, forgotPassword, resetPassword, updateProfile, updateAvailability, changePassword, logout }
 }

@@ -41,6 +41,7 @@ describe('Events (e2e)', () => {
       title: 'Foot du jeudi',
       location: 'Urban Soccer',
       startsAt: new Date(Date.now() + 86_400_000).toISOString(),
+      durationMinutes: 90,
       maxParticipants: 2,
       paymentUrl: '',
     };

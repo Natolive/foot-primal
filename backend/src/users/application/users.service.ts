@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import type { ManagedUserDto, UpdateUserDto, UpdateUserPermissionsDto, UpdateUserRoleDto } from '@footix/shared';
+import { WEEKDAYS, type DayAvailabilityDto, type ManagedUserDto, type UpdateUserDto, type UpdateUserPermissionsDto, type UpdateUserRoleDto } from '@footix/shared';
 import { BaseService } from '../../common/application/base.service.js';
 import { EmailAlreadyUsedError, OwnAccessLockedError, SuperAdminOnlyError } from '../domain/errors.js';
 import { toManagedUser, type NewUser, type PublicUser, type User } from '../domain/user.entity.js';
 import { UserRepository } from '../domain/user.repository.js';
+
+const byName = (a: User, b: User) => a.lastName.localeCompare(b.lastName, 'fr') || a.firstName.localeCompare(b.firstName, 'fr');
 
 @Injectable()
 export class UsersService extends BaseService<User, NewUser> {
@@ -33,9 +35,16 @@ export class UsersService extends BaseService<User, NewUser> {
 
   async findAllManaged(): Promise<ManagedUserDto[]> {
     const users = await this.findAll();
-    return users
-      .toSorted((a, b) => a.lastName.localeCompare(b.lastName, 'fr') || a.firstName.localeCompare(b.firstName, 'fr'))
-      .map(toManagedUser);
+    return users.toSorted(byName).map(toManagedUser);
+  }
+
+  // Comptes confirmés seulement : un compte jamais activé ne viendra pas jouer.
+  async findAvailability(): Promise<DayAvailabilityDto[]> {
+    const players = (await this.findAll()).filter((u) => u.emailVerifiedAt).toSorted(byName);
+    return WEEKDAYS.map((day) => ({
+      day,
+      people: players.filter((u) => u.availableDays.includes(day)).map(({ id, firstName, lastName }) => ({ id, firstName, lastName })),
+    }));
   }
 
   // `actor` : l'administrateur qui fait la modification, `id` : la personne modifiée.

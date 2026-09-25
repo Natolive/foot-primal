@@ -1,6 +1,9 @@
 // Un droit par action protégée de l'API ; nouvelle action = nouveau droit ici, avec son libellé.
 export const PERMISSIONS = [
   'profile.read',
+  'profile.update',
+  'profile.change_password',
+  'profile.update_availability',
   'profile.complete_onboarding',
   'roles.read',
   'roles.update',
@@ -15,6 +18,7 @@ export const PERMISSIONS = [
   'planning.create_event',
   'planning.update_event',
   'planning.delete_event',
+  'planning.read_availability',
   'email_domains.read',
   'email_domains.create',
   'email_domains.delete',
@@ -23,6 +27,9 @@ export type Permission = (typeof PERMISSIONS)[number]
 
 export const PERMISSION_LABELS: Record<Permission, string> = {
   'profile.read': 'Voir son profil',
+  'profile.update': 'Modifier son nom et son prénom',
+  'profile.change_password': 'Changer son mot de passe',
+  'profile.update_availability': 'Renseigner ses dispos',
   'profile.complete_onboarding': 'Terminer la visite guidée',
   'roles.read': 'Voir les rôles et leurs droits',
   'roles.update': 'Modifier les droits des rôles',
@@ -37,6 +44,7 @@ export const PERMISSION_LABELS: Record<Permission, string> = {
   'planning.create_event': 'Créer des créneaux',
   'planning.update_event': 'Modifier les créneaux',
   'planning.delete_event': 'Supprimer les créneaux',
+  'planning.read_availability': 'Voir les dispos des joueurs',
   'email_domains.read': 'Voir les domaines email autorisés',
   'email_domains.create': 'Autoriser un domaine email',
   'email_domains.delete': 'Retirer un domaine email',

@@ -11,7 +11,7 @@ const { user, fetchUser } = useAuth()
 const canUpdate = computed(() => !!user.value?.permissions.includes('roles.update'))
 
 const fieldsFor = (role: RoleDto): FormFieldConfig<UpdateRoleDto>[] => [
-  { name: 'permissions', label: 'Droits', type: 'checkbox-group', groups: permissionGroups, disabled: !role.editable || !canUpdate.value },
+  { name: 'permissions', label: '', type: 'checkbox-group', groups: permissionGroups, disabled: !role.editable || !canUpdate.value },
 ]
 
 const { data: roles } = await useAsyncData('roles', () => api<RoleDto[]>('/roles'), { default: () => [] })

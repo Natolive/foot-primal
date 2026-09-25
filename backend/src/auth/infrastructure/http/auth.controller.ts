@@ -1,14 +1,20 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Patch, Post, Put, Req, Res } from '@nestjs/common';
 import {
+  changePasswordSchema,
   forgotPasswordSchema,
   loginSchema,
   resetPasswordSchema,
   signupSchema,
+  updateAvailabilitySchema,
+  updateProfileSchema,
   verifyEmailSchema,
+  type ChangePasswordDto,
   type ForgotPasswordDto,
   type LoginDto,
   type ResetPasswordDto,
   type SignupDto,
+  type UpdateAvailabilityDto,
+  type UpdateProfileDto,
   type UserDto,
   type VerifyEmailDto,
 } from '@footix/shared';
@@ -96,5 +102,33 @@ export class AuthController {
   @Authorize('profile.read')
   me(@CurrentUser() user: UserDto): UserDto {
     return user;
+  }
+
+  @Patch('me')
+  @Authorize('profile.update')
+  updateProfile(@CurrentUser() user: UserDto, @Body(new ZodValidationPipe(updateProfileSchema)) dto: UpdateProfileDto): Promise<UserDto> {
+    return this.auth.updateProfile(user, dto);
+  }
+
+  @Put('me/availability')
+  @Authorize('profile.update_availability')
+  updateAvailability(
+    @CurrentUser() user: UserDto,
+    @Body(new ZodValidationPipe(updateAvailabilitySchema)) dto: UpdateAvailabilityDto,
+  ): Promise<UserDto> {
+    return this.auth.updateAvailability(user, dto);
+  }
+
+  // Essais du mot de passe actuel : limite par IP, comme les autres routes qui testent un mot de passe.
+  @Post('me/password')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Authorize('profile.change_password')
+  @RateLimit({ by: 'ip', limit: 10, windowMs: 15 * MINUTE })
+  changePassword(
+    @CurrentUser() user: UserDto,
+    @Req() req: Request,
+    @Body(new ZodValidationPipe(changePasswordSchema)) dto: ChangePasswordDto,
+  ): Promise<void> {
+    return this.auth.changePassword(user, readSessionCookie(req), dto);
   }
 }

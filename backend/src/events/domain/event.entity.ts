@@ -7,6 +7,7 @@ export interface Event {
   description: string | null;
   location: string;
   startsAt: Date;
+  durationMinutes: number;
   maxParticipants: number;
   paymentUrl: string | null;
   createdAt: Date;
@@ -28,7 +29,7 @@ export interface Guest {
 const toParticipantDto = ({ id, firstName, lastName }: Participant) => ({ id, firstName, lastName });
 
 export const toEventDto = (
-  { id, title, description, location, startsAt, maxParticipants, paymentUrl }: Event,
+  { id, title, description, location, startsAt, durationMinutes, maxParticipants, paymentUrl }: Event,
   participants: Participant[],
   guests: Guest[],
 ): EventDto => ({
@@ -37,6 +38,7 @@ export const toEventDto = (
   description,
   location,
   startsAt: startsAt.toISOString(),
+  durationMinutes,
   maxParticipants,
   paymentUrl,
   participants: participants.filter((p) => p.attending).map(toParticipantDto),

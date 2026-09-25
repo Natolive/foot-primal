@@ -4,24 +4,24 @@ import { html, type SafeHtml } from '../html.js';
 export const appUrl = (path: string) => `${process.env.APP_URL}${path}`;
 
 // Couleurs de l'appli (frontend/app/assets/css/main.css), en dur : les clients mail ignorent les variables CSS.
-const BLUE = '#2d4bff';
-const NIGHT = '#121a4a';
-const TEXT = '#334155';
-const MUTED = '#64748b';
+const GREEN = '#15803d';
+const NIGHT = '#062112';
+const TEXT = '#404040';
+const MUTED = '#525252';
 const FONT = "'Helvetica Neue',Helvetica,Arial,sans-serif";
 
 // Bouton en tableau : seul rendu fiable partout, Outlook compris. Le lien est aussi donné en clair en dessous.
 export const button = (label: string, href: string) =>
   html`<table role="presentation" cellpadding="0" cellspacing="0" style="margin:32px 0 8px">
-  <tr><td style="border-radius:12px;background:${BLUE}">
+  <tr><td style="border-radius:12px;background:${GREEN}">
     <a href="${href}" style="display:inline-block;padding:15px 28px;font-family:${FONT};font-size:16px;font-weight:bold;color:#ffffff;text-decoration:none;border-radius:12px">${label}</a>
   </td></tr>
 </table>
-<p style="margin:0 0 24px;font-size:13px;line-height:1.5;color:${MUTED}">Le bouton ne marche pas ? Copie ce lien dans ton navigateur :<br><a href="${href}" style="color:${BLUE};word-break:break-all">${href}</a></p>`;
+<p style="margin:0 0 24px;font-size:13px;line-height:1.5;color:${MUTED}">Le bouton ne marche pas ? Copie ce lien dans ton navigateur :<br><a href="${href}" style="color:${GREEN};word-break:break-all">${href}</a></p>`;
 
 // Précision en petit sous le bouton (validité du lien, que faire si ce n'est pas toi).
 export const note = (text: string) =>
-  html`<p style="margin:0;padding-top:24px;border-top:1px solid #e2e8f0;font-size:14px;line-height:1.6;color:${MUTED}">${text}</p>`;
+  html`<p style="margin:0;padding-top:24px;border-top:1px solid #e5e5e5;font-size:14px;line-height:1.6;color:${MUTED}">${text}</p>`;
 
 export const paragraph = (text: string) => html`<p style="margin:0 0 16px">${text}</p>`;
 
@@ -36,12 +36,12 @@ export const layout = ({ title, preheader, content }: { title: string; preheader
     <meta name="color-scheme" content="light">
     <title>${title}</title>
   </head>
-  <body style="margin:0;padding:0;background:#f4f6ff">
+  <body style="margin:0;padding:0;background:#effaf3">
     <div style="display:none;max-height:0;overflow:hidden;opacity:0">${preheader}</div>
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6ff">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#effaf3">
       <tr><td align="center" style="padding:32px 16px">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:20px;overflow:hidden">
-          <tr><td style="background:${BLUE}">
+          <tr><td style="background:${GREEN}">
             <a href="${appUrl('/')}"><img src="${appUrl('/email/header.png')}" width="600" alt="Footix" style="display:block;width:100%;height:auto;border:0;color:#ffffff;font-family:${FONT};font-size:28px;font-weight:bold;line-height:80px;text-indent:44px"></a>
           </td></tr>
           <tr><td style="padding:40px 44px 44px;font-family:${FONT};font-size:16px;line-height:1.6;color:${TEXT}">

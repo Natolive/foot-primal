@@ -5,18 +5,18 @@
   --font-sans: 'Geist', sans-serif;
   --font-display: 'Unbounded', sans-serif;
 
-  /* Bleu Footix : couleur primaire (500 en clair, 400 en sombre, contrastes AA avec le blanc et le fond sombre). */
-  --color-footix-50: #eef2ff;
-  --color-footix-100: #dfe6ff;
-  --color-footix-200: #c5d0ff;
-  --color-footix-300: #9daeff;
-  --color-footix-400: #6680ff;
-  --color-footix-500: #2d4bff;
-  --color-footix-600: #2440e8;
-  --color-footix-700: #1f36c9;
-  --color-footix-800: #1e2fa0;
-  --color-footix-900: #1d2c7e;
-  --color-footix-950: #121a4a;
+  /* Vert Footix : couleur primaire (500 : contraste AA avec le blanc, en fond comme en texte). */
+  --color-footix-50: #effaf3;
+  --color-footix-100: #d8f3e1;
+  --color-footix-200: #b3e6c6;
+  --color-footix-300: #7dd3a0;
+  --color-footix-400: #3fb46f;
+  --color-footix-500: #15803d;
+  --color-footix-600: #126b33;
+  --color-footix-700: #10582b;
+  --color-footix-800: #0f4725;
+  --color-footix-900: #0d3b20;
+  --color-footix-950: #062112;
   /* Le ballon : point du « i » du logo, uniquement décoratif (contraste trop faible pour du texte). */
   --color-ball: #ff5a36;
   /* Traits du terrain. */
@@ -24,7 +24,7 @@
 }
 
 /* Contraste renforcé : chaque niveau de texte un cran plus foncé que Nuxt UI (le plus pâle reste AA sur blanc),
-   bordures plus marquées, page bleutée franche sous des cartes blanches. */
+   bordures plus marquées, page vert pâle sous des cartes blanches. Thème clair uniquement (`ui.colorMode: false`). */
 :root {
   --ui-text-dimmed: var(--ui-color-neutral-500);
   --ui-text-muted: var(--ui-color-neutral-600);
@@ -35,22 +35,6 @@
   --ui-border-accented: var(--ui-color-neutral-400);
 }
 body { background: var(--color-footix-100); }
-/* En sombre, bleu marine plutôt que gris-noir, textes un cran plus clairs. */
-.dark {
-  --ui-text-dimmed: var(--ui-color-neutral-400);
-  --ui-text-muted: var(--ui-color-neutral-300);
-  --ui-text-toned: var(--ui-color-neutral-200);
-  --ui-text: var(--ui-color-neutral-100);
-  --ui-text-highlighted: white;
-  --ui-bg: var(--color-footix-950);
-  --ui-bg-muted: #17215c;
-  --ui-bg-elevated: #1b276a;
-  --ui-bg-accented: #243285;
-  --ui-border: #34469f;
-  --ui-border-muted: #1b276a;
-  --ui-border-accented: #4458c0;
-}
-.dark body { background: #0d1438; }
 
 /* Tailwind v4 ne met plus de main sur les boutons : on la remet partout où l'on peut cliquer. */
 @layer base {

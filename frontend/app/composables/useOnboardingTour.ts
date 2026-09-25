@@ -10,6 +10,7 @@ const demoEvent = (): EventDto => ({
   description: 'Chasubles fournies, prévois des chaussures à crampons moulés.',
   location: 'Urban Soccer, 12 rue du Stade',
   startsAt: new Date(Date.now() + 3 * 24 * 3_600_000).toISOString(),
+  durationMinutes: 60,
   maxParticipants: 10,
   paymentUrl: 'https://lydia-app.com/',
   participants: [
@@ -55,6 +56,7 @@ export const useOnboardingTour = () => {
         { element: '[data-tour="event"]', popover: { title: 'Les créneaux', description: 'Chaque match proposé s’affiche ici : date, lieu et places libres.' } },
         { element: '[data-tour="answer"]', popover: { title: 'Réponds au sondage', description: '« Je viens » réserve ta place, « Je ne viens pas » prévient les autres. Tu peux changer d’avis à tout moment.' } },
         { element: '[data-tour="pay"]', popover: { title: 'Paie ta place', description: 'Si le créneau a un lien de paiement, règle ta part avant le match.' } },
+        { element: '[data-tour="account"]', popover: { title: 'Donne tes dispos', description: 'Dans « Mon profil », coche les jours où tu peux jouer : les organisateurs s’en servent pour choisir les créneaux.' } },
       ],
     }).drive()
   })

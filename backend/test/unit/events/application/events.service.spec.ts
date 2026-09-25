@@ -16,6 +16,7 @@ describe('EventsService', () => {
     title: 'Foot du jeudi',
     location: 'Urban Soccer',
     startsAt: new Date(Date.now() + inDays * DAY),
+    durationMinutes: 90,
     maxParticipants,
     paymentUrl: null,
     description: null,
@@ -64,7 +65,7 @@ describe('EventsService', () => {
 
   it('emails a calendar invite once per person, even if they change their mind', async () => {
     const [lea, max] = await Promise.all(['Léa', 'Max'].map((n) => users.create(person(n))));
-    const { id } = await events.createEvent(match(1, 1));
+    const { id, startsAt } = await events.createEvent(match(1, 1));
     await events.answer(id, lea, yes);
     await events.answer(id, lea, yes);
     await expect(events.answer(id, max, yes)).rejects.toBeInstanceOf(EventFullError);
@@ -75,6 +76,9 @@ describe('EventsService', () => {
     await events.answer(id, max, yes);
     expect(mailer.sent.map((m) => m.to.email)).toEqual(['Léa@solem.fr', 'Max@solem.fr']);
     expect(mailer.sent[0].attachments![0].content).toContain(`UID:${id}@footix`);
+    // Fin du match = début + durée du créneau (90 min).
+    const end = new Date(Date.parse(startsAt) + 90 * 60_000).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    expect(mailer.sent[0].attachments![0].content).toContain(`DTEND:${end}`);
   });
 
   it('closes registrations once the event has started', async () => {

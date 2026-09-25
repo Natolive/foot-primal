@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "available_days" text[] DEFAULT '{}' NOT NULL;

@@ -7,7 +7,7 @@ describe('ZodValidationPipe', () => {
 
   it('returns the parsed body', () => {
     const body = { lastName: ' Dupont ', firstName: 'Léa', email: 'Lea@Solem.fr', password: '12345678' };
-    expect(pipe.transform(body)).toEqual({ ...body, lastName: 'Dupont', email: 'lea@solem.fr' });
+    expect(pipe.transform(body)).toEqual({ ...body, lastName: 'Dupont', email: 'lea@solem.fr', availableDays: [] });
   });
 
   it('rejects an invalid body with field errors', () => {

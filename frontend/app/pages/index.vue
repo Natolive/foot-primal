@@ -18,9 +18,10 @@ const replace = (updated: EventDto) => {
 }
 
 const fields: FormFieldConfig<EventInput>[] = [
-  { name: 'title', label: 'Titre', placeholder: 'Foot du jeudi' },
-  { name: 'startsAt', label: 'Date et heure', type: 'datetime-local', half: true },
+  { name: 'title', label: 'Titre', placeholder: 'Foot du jeudi', half: true },
   { name: 'maxParticipants', label: 'Nombre de places', type: 'number', half: true },
+  { name: 'startsAt', label: 'Date et heure', type: 'datetime-local', half: true },
+  { name: 'durationMinutes', label: 'Durée (minutes)', type: 'number', half: true },
   { name: 'location', label: 'Lieu', placeholder: 'Urban Soccer, 12 rue du Stade', icon: 'i-lucide-map-pin' },
   { name: 'paymentUrl', label: 'Lien de paiement', type: 'url', placeholder: 'https://lydia-app.com/…', icon: 'i-lucide-credit-card', help: 'Facultatif.' },
   { name: 'description', label: 'Infos', type: 'textarea', placeholder: 'Prévoir des chaussures à crampons moulés…', help: 'Facultatif.' },
@@ -36,7 +37,7 @@ const toLocalInput = (iso: string) => {
 const form = ref<{ id?: string, state: EventInput }>()
 
 function openCreate() {
-  form.value = { state: { title: '', location: '', startsAt: '', maxParticipants: 10, paymentUrl: '', description: '' } }
+  form.value = { state: { title: '', location: '', startsAt: '', durationMinutes: 60, maxParticipants: 10, paymentUrl: '', description: '' } }
 }
 
 function openEdit({ id, participants: _, startsAt, paymentUrl, description, ...rest }: EventDto) {
@@ -107,7 +108,7 @@ async function confirmDelete() {
     <UModal
       :open="!!form"
       :title="form?.id ? 'Modifier le créneau' : 'Créer un créneau'"
-      description="Date, lieu et nombre de places, le lien de paiement est facultatif."
+      description="Date, durée, lieu et nombre de places, le lien de paiement est facultatif."
       @update:open="(open) => !open && (form = undefined)"
     >
       <template #body>

@@ -11,10 +11,12 @@ const toast = useToast()
 const { user } = useAuth()
 const can = (p: Permission) => !!user.value?.permissions.includes(p)
 
-const when = computed(() =>
-  new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })
-    .format(new Date(props.event.startsAt)),
-)
+// « jeudi 1 octobre, 18:00 – 19:30 »
+const when = computed(() => {
+  const start = new Date(props.event.startsAt)
+  return new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })
+    .formatRange(start, new Date(start.getTime() + props.event.durationMinutes * 60_000))
+})
 // Invités et inscrits se partagent les places.
 const taken = computed(() => props.event.participants.length + props.event.guests.length)
 const coming = computed(() => props.event.participants.some((p) => p.id === user.value?.id))
