@@ -62,6 +62,8 @@ Tests back : `docker compose exec backend npm test` (unitaires), `docker compose
 - Le premier « je viens » qui prend une place envoie un email de confirmation avec le match en `.ics` (durée fixe 1 h) :
   un seul par personne et par créneau (`event_participants.confirmation_sent_at`), même si elle change d'avis.
   Un échec d'envoi est loggé sans annuler l'inscription.
+- Se désinscrire passe par une modal de confirmation (qui liste ses invités, libérés avec soi) ; recliquer sur
+  la réponse déjà donnée ne fait rien.
 - Rôles : `user` répond aux sondages et ramène des invités, `admin` organise aussi les créneaux (catégorie de droits `planning`), `super_admin` a tout.
   Premier super admin : `UPDATE users SET role = 'super_admin' WHERE email = '…'`.
 

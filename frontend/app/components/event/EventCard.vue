@@ -53,13 +53,15 @@ async function removeGuest(g: GuestDto) {
   toast.add({ title: 'Invité retiré', description: `${g.name} libère sa place.`, color: 'success', icon: 'i-lucide-check' })
 }
 
+// Même réponse qu'avant : rien à enregistrer, pas de toast à chaque clic.
 async function answer(attending: boolean) {
+  if (attending ? coming.value : declined.value) return true
   let updated: EventDto
   try {
     updated = await api<EventDto>(`/events/${props.event.id}/participation`, { method: 'PUT', body: { attending } })
   } catch (e) {
     toast.add({ title: 'Réponse impossible', description: apiErrorMessage(e), color: 'error', icon: 'i-lucide-circle-alert' })
-    return
+    return false
   }
   emit('updated', updated)
   kicked.value = attending
@@ -69,6 +71,15 @@ async function answer(attending: boolean) {
     color: 'success',
     icon: 'i-lucide-check',
   })
+  return true
+}
+
+// Se désinscrire libère la place (et celles de ses invités) : on demande d'abord.
+const leaving = ref(false)
+const myGuests = computed(() => props.event.guests.filter((g) => g.invitedBy.id === user.value?.id))
+
+async function confirmLeave() {
+  if (await answer(false)) leaving.value = false
 }
 </script>
 
@@ -176,7 +187,7 @@ async function answer(attending: boolean) {
           size="lg"
           loading-auto
           class="justify-center font-semibold"
-          @click="answer(false)"
+          @click="coming ? (leaving = true) : answer(false)"
         >
           Je ne viens pas
         </UButton>
@@ -209,6 +220,21 @@ async function answer(attending: boolean) {
           :submit="addGuest"
           submit-label="Ajouter l’invité"
         />
+      </template>
+    </UModal>
+
+    <UModal
+      v-model:open="leaving"
+      title="Tu ne viens plus ?"
+      :description="myGuests.length
+        ? `Ta place et celles de tes invités (${myGuests.map((g) => g.name).join(', ')}) seront libérées pour « ${event.title} ».`
+        : `Ta place pour « ${event.title} » sera libérée, quelqu’un d’autre pourra la prendre.`"
+    >
+      <template #footer>
+        <div class="flex w-full justify-end gap-2">
+          <UButton color="neutral" variant="ghost" @click="leaving = false">Rester inscrit</UButton>
+          <UButton color="error" icon="i-lucide-user-x" loading-auto @click="confirmLeave">Me désinscrire</UButton>
+        </div>
       </template>
     </UModal>
   </UCard>

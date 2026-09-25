@@ -8,6 +8,7 @@
 - Titres en `font-display` (Unbounded) en minuscules et `tracking-tight`, texte en Geist ; bleu `primary`, ballon `ball` décoratif seulement.
 - Mode clair et sombre, responsive dès 360 px.
 - Animation uniquement en réponse à une action (seule exception : le ballon qui tombe sur le terrain de la page de connexion), désactivée sous `prefers-reduced-motion`.
+- Action qui retire ou libère quelque chose (suppression, désinscription) = `UModal` de confirmation qui dit ce qui part ; action sans effet (réponse déjà donnée) = rien, ni requête ni toast.
 - Textes en français, tutoiement, bouton = verbe d'action repris dans le toast.
 - SPA (`ssr: false`) : pas de code qui suppose un rendu serveur.
 - Appels API via `useApi()` (cookie de session inclus), erreur affichée avec `apiErrorMessage(e)` dans un toast.
