@@ -8,6 +8,8 @@ const GREEN = '#15803d';
 const NIGHT = '#062112';
 const TEXT = '#404040';
 const MUTED = '#525252';
+// Version dans l'URL : les messageries (proxy d'images de Gmail…) gardent l'image en cache par URL ; à changer avec l'image.
+const HEADER = '/email/header.png?v=2';
 const FONT = "'Helvetica Neue',Helvetica,Arial,sans-serif";
 
 // Bouton en tableau : seul rendu fiable partout, Outlook compris. Le lien est aussi donné en clair en dessous.
@@ -42,7 +44,7 @@ export const layout = ({ title, preheader, content }: { title: string; preheader
       <tr><td align="center" style="padding:32px 16px">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:20px;overflow:hidden">
           <tr><td style="background:${GREEN}">
-            <a href="${appUrl('/')}"><img src="${appUrl('/email/header.png')}" width="600" alt="Footix" style="display:block;width:100%;height:auto;border:0;color:#ffffff;font-family:${FONT};font-size:28px;font-weight:bold;line-height:80px;text-indent:44px"></a>
+            <a href="${appUrl('/')}"><img src="${appUrl(HEADER)}" width="600" alt="Footix" style="display:block;width:100%;height:auto;border:0;color:#ffffff;font-family:${FONT};font-size:28px;font-weight:bold;line-height:80px;text-indent:44px"></a>
           </td></tr>
           <tr><td style="padding:40px 44px 44px;font-family:${FONT};font-size:16px;line-height:1.6;color:${TEXT}">
             <h1 style="margin:0 0 20px;font-size:26px;line-height:1.2;letter-spacing:-0.02em;color:${NIGHT}">${title}</h1>
