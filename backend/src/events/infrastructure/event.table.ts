@@ -23,6 +23,8 @@ export const eventParticipants = pgTable(
       .references(() => users.id, { onDelete: 'cascade' }),
     // false : a répondu « je ne viens pas », ne prend pas de place.
     attending: boolean().notNull().default(true),
+    // Email de confirmation (.ics) déjà envoyé : un seul par personne et par créneau, même si elle change d'avis.
+    confirmationSentAt: timestamp('confirmation_sent_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [primaryKey({ columns: [t.eventId, t.userId] })],

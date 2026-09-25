@@ -7,7 +7,7 @@ import { Mailer, type Mail } from '../domain/mailer.js';
 export class BrevoMailer extends Mailer {
   private readonly logger = new Logger(BrevoMailer.name);
 
-  async send({ to, subject, html }: Mail): Promise<void> {
+  async send({ to, subject, html, attachments }: Mail): Promise<void> {
     const apiKey = process.env.BREVO_API_KEY;
     if (!apiKey) {
       this.logger.warn(`BREVO_API_KEY absente, email « ${subject} » non envoyé à ${to.email} :\n${html}`);
@@ -22,6 +22,8 @@ export class BrevoMailer extends Mailer {
         to: [to],
         subject,
         htmlContent: html,
+        // Brevo déduit le type de l'extension (`.ics` autorisé).
+        attachment: attachments?.map((a) => ({ name: a.name, content: Buffer.from(a.content).toString('base64') })),
       }),
     });
     if (!res.ok) throw new Error(`Brevo a refusé l'email (${res.status}) : ${await res.text()}`);

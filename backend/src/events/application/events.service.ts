@@ -1,6 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import type { AddGuestDto, AnswerEventDto, EventDto, SaveEventDto, UserDto } from '@footix/shared';
 import { BaseService } from '../../common/application/base.service.js';
+import { eventRegistrationMail } from '../../mail/application/templates/event-registration.mail.js';
+import { Mailer } from '../../mail/domain/mailer.js';
 import {
   EventFullError,
   EventStartedError,
@@ -15,8 +17,12 @@ import { EventRepository } from '../domain/event.repository.js';
 @Injectable()
 export class EventsService extends BaseService<Event, NewEvent> {
   protected readonly notFoundMessage = 'Créneau introuvable.';
+  private readonly logger = new Logger(EventsService.name);
 
-  constructor(protected override readonly repository: EventRepository) {
+  constructor(
+    protected override readonly repository: EventRepository,
+    private readonly mailer: Mailer,
+  ) {
     super(repository);
   }
 
@@ -46,9 +52,14 @@ export class EventsService extends BaseService<Event, NewEvent> {
     return toEventDto(await this.update(id, dto), participants, guests);
   }
 
-  async answer(id: string, userId: string, { attending }: AnswerEventDto): Promise<EventDto> {
-    await this.findOpen(id);
-    if (!(await this.repository.answer(id, userId, attending))) throw new EventFullError();
+  // Premier « je viens » qui prend une place : email de confirmation avec le match en .ics (une seule fois).
+  async answer(id: string, user: Pick<UserDto, 'id' | 'email' | 'firstName'>, { attending }: AnswerEventDto): Promise<EventDto> {
+    const event = await this.findOpen(id);
+    if (!(await this.repository.answer(id, user.id, attending))) throw new EventFullError();
+    if (attending && (await this.repository.claimConfirmation(id, user.id))) {
+      // ponytail: email perdu s'il échoue (pas de renvoi) ; la place reste prise, sans erreur pour la personne.
+      await this.mailer.send(eventRegistrationMail(user, event)).catch((e) => this.logger.error(`Confirmation non envoyée à ${user.email}`, e));
+    }
     return this.findDto(id);
   }
 

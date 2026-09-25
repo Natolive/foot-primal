@@ -59,6 +59,9 @@ Tests back : `docker compose exec backend npm test` (unitaires), `docker compose
 - Qui vient peut ramener des invités sans compte (juste un nom, droit `events.invite_guest`) : chacun prend une place.
   Répondre « je ne viens pas » retire ses invités ; on retire les siens, un organisateur (`planning.update_event`)
   retire ceux de tout le monde. Plus d'ajout ni de retrait une fois le match commencé.
+- Le premier « je viens » qui prend une place envoie un email de confirmation avec le match en `.ics` (durée fixe 1 h) :
+  un seul par personne et par créneau (`event_participants.confirmation_sent_at`), même si elle change d'avis.
+  Un échec d'envoi est loggé sans annuler l'inscription.
 - Rôles : `user` répond aux sondages et ramène des invités, `admin` organise aussi les créneaux (catégorie de droits `planning`), `super_admin` a tout.
   Premier super admin : `UPDATE users SET role = 'super_admin' WHERE email = '…'`.
 
@@ -68,6 +71,8 @@ Tests back : `docker compose exec backend npm test` (unitaires), `docker compose
 - Un email = un template `src/mail/application/templates/<nom>.mail.ts` qui renvoie `{ to, subject, html }`
   dans le cadre commun `layout()` ; valeurs insérées via `html\`\`` (échappées automatiquement).
   Envoi : `mailer.send(monMail(...))`, avec `MailModule` importé dans le module.
+- Pièce jointe : `attachments: [{ name, contentType, content }]` (contenu en clair, encodé par l'adaptateur) ;
+  fichier calendrier via `ics()` (`src/mail/application/ics.ts`).
 - Dev : les emails arrivent dans Mailpit (http://mail.footix.localhost), rien ne part vraiment.
   Sans Mailpit ni `BREVO_API_KEY` (CI), l'email s'affiche dans les logs du back.
 

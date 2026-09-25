@@ -4,7 +4,7 @@ import { InMemoryRepository } from './in-memory.repository.js';
 import type { InMemoryUserRepository } from './in-memory-user.repository.js';
 
 export class InMemoryEventRepository extends InMemoryRepository<Event, NewEvent> implements EventRepository {
-  participations: { eventId: string; userId: string; attending: boolean }[] = [];
+  participations: { eventId: string; userId: string; attending: boolean; confirmed?: boolean }[] = [];
   guests: { id: string; eventId: string; invitedBy: string; name: string }[] = [];
 
   // Les inscrits sont lus dans les utilisateurs, comme la jointure en base.
@@ -50,6 +50,13 @@ export class InMemoryEventRepository extends InMemoryRepository<Event, NewEvent>
 
   async removeGuest(guestId: string) {
     this.guests = this.guests.filter((g) => g.id !== guestId);
+  }
+
+  async claimConfirmation(eventId: string, userId: string) {
+    const mine = this.participations.find((p) => p.eventId === eventId && p.userId === userId);
+    if (!mine?.attending || mine.confirmed) return false;
+    mine.confirmed = true;
+    return true;
   }
 
   private taken(eventId: string) {

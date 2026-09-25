@@ -36,6 +36,13 @@
       "when": 1790264910872,
       "tag": "0004_add_event_guests",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790319994367,
+      "tag": "0005_add_event_confirmation_sent_at",
+      "breakpoints": true
     }
   ]
 }

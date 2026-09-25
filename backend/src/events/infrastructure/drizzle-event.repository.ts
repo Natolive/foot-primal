@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, asc, count, eq, gt, inArray } from 'drizzle-orm';
+import { and, asc, count, eq, gt, inArray, isNull } from 'drizzle-orm';
 import { DB, type Database } from '../../common/infrastructure/database/database.module.js';
 import { DrizzleRepository } from '../../common/infrastructure/database/drizzle.repository.js';
 import { users } from '../../users/infrastructure/user.table.js';
@@ -81,6 +81,22 @@ export class DrizzleEventRepository extends DrizzleRepository<typeof events, Eve
 
   async removeGuest(guestId: string): Promise<void> {
     await this.db.delete(eventGuests).where(eq(eventGuests.id, guestId));
+  }
+
+  async claimConfirmation(eventId: string, userId: string): Promise<boolean> {
+    const claimed = await this.db
+      .update(eventParticipants)
+      .set({ confirmationSentAt: new Date() })
+      .where(
+        and(
+          eq(eventParticipants.eventId, eventId),
+          eq(eventParticipants.userId, userId),
+          eq(eventParticipants.attending, true),
+          isNull(eventParticipants.confirmationSentAt),
+        ),
+      )
+      .returning({ userId: eventParticipants.userId });
+    return claimed.length > 0;
   }
 
   // Verrou sur le créneau : deux ajouts simultanés ne dépassent pas le nombre de places.

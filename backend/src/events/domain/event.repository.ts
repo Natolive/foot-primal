@@ -12,4 +12,6 @@ export abstract class EventRepository extends BaseRepository<Event, NewEvent> {
   // Ajoute l'invité seulement si la personne qui le ramène vient et qu'il reste une place.
   abstract addGuest(eventId: string, invitedBy: string, name: string): Promise<'added' | 'not_attending' | 'full'>;
   abstract removeGuest(guestId: string): Promise<void>;
+  // true une seule fois par personne et par créneau, et seulement si elle vient : l'appelant envoie alors la confirmation.
+  abstract claimConfirmation(eventId: string, userId: string): Promise<boolean>;
 }

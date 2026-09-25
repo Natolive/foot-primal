@@ -5,7 +5,7 @@ import { Mailer, type Mail } from '../domain/mailer.js';
 // API d'envoi : https://mailpit.axllent.org/docs/api-v1/view.html#post-/api/v1/send
 @Injectable()
 export class MailpitMailer extends Mailer {
-  async send({ to, subject, html }: Mail): Promise<void> {
+  async send({ to, subject, html, attachments }: Mail): Promise<void> {
     const res = await fetch(`${process.env.MAILPIT_URL}/api/v1/send`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -14,6 +14,11 @@ export class MailpitMailer extends Mailer {
         To: [{ Name: to.name, Email: to.email }],
         Subject: subject,
         HTML: html,
+        Attachments: attachments?.map((a) => ({
+          Filename: a.name,
+          ContentType: a.contentType,
+          Content: Buffer.from(a.content).toString('base64'),
+        })),
       }),
     });
     if (!res.ok) throw new Error(`Mailpit a refusé l'email (${res.status}) : ${await res.text()}`);

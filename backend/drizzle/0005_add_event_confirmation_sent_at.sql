@@ -1,0 +1,1 @@
+ALTER TABLE "event_participants" ADD COLUMN "confirmation_sent_at" timestamp with time zone;

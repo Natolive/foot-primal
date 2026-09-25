@@ -53,7 +53,7 @@ export class EventsController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body(new ZodValidationPipe(answerEventSchema)) dto: AnswerEventDto,
   ): Promise<EventDto> {
-    return this.events.answer(id, user.id, dto);
+    return this.events.answer(id, user, dto);
   }
 
   // Invité sans compte ramené par la personne connectée, qui doit venir elle-même.

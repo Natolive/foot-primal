@@ -6,7 +6,7 @@
 - Service CRUD = étend `BaseService` ; les services lèvent des erreurs métier (`NotFoundError`, `ConflictError`), jamais d'exception HTTP.
 - Controllers dans `infrastructure/http/`, body validé par `ZodValidationPipe` avec un schéma `@footix/shared`.
 - Route protégée = `@Authorize('<catégorie>.<action>')`, vérifié par le guard global `SessionGuard` (401 sans session, 403 sans droit) ; sans décorateur, la route est publique ; `@CurrentUser()` donne la personne connectée.
-- Email = template `src/mail/application/templates/<nom>.mail.ts` (cadre `layout()`, valeurs via `html\`\`` échappées), envoyé par `mailer.send(...)` avec `MailModule` importé ; jamais de HTML ni d'appel Brevo ailleurs.
+- Email = template `src/mail/application/templates/<nom>.mail.ts` (cadre `layout()`, valeurs via `html\`\`` échappées), envoyé par `mailer.send(...)` avec `MailModule` importé ; jamais de HTML ni d'appel Brevo ailleurs ; pièce jointe via `attachments`, agenda via `ics()`.
 - Route publique qui envoie un email ou teste un mot de passe = `@RateLimit(...)` (par email et/ou par IP).
 - Lien envoyé par email : jeton aléatoire stocké haché (`hashToken`), à usage unique, avec une date d'expiration.
 - Table Drizzle dans `<domaine>/infrastructure/*.table.ts`, déclarée dans `common/infrastructure/database/schema.ts`.

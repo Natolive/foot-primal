@@ -3,6 +3,8 @@ export interface Mail {
   to: { email: string; name: string };
   subject: string;
   html: string;
+  // Contenu en clair (texte), encodé en base64 par l'adaptateur.
+  attachments?: { name: string; contentType: string; content: string }[];
 }
 
 export abstract class Mailer {
