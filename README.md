@@ -66,6 +66,8 @@ Tests back : `docker compose exec backend npm test` (unitaires), `docker compose
 - Le premier « je viens » qui prend une place envoie un email de confirmation avec le match en `.ics` (fin = début + durée) :
   un seul par personne et par créneau (`event_participants.confirmation_sent_at`), même si elle change d'avis.
   Un échec d'envoi est loggé sans annuler l'inscription.
+- Supprimer un créneau pas encore commencé envoie un email d'annulation à ceux qui venaient (pas aux « je ne viens pas ») ;
+  un échec d'envoi est loggé, la suppression reste faite.
 - Se désinscrire passe par une modal de confirmation (qui liste ses invités, libérés avec soi) ; recliquer sur
   la réponse déjà donnée ne fait rien.
 - Dispos : à l'inscription puis dans son profil, chacun coche les jours de la semaine où il peut jouer (`PUT /auth/me/availability`,
@@ -132,7 +134,7 @@ HTTPS assuré par Caddy sur le serveur (`/etc/caddy/Caddyfile` : `foot.benit.ooo
 
 À chaque push sur `main`, `.github/workflows/prod.yml` lance les tests, publie l'image sur
 `ghcr.io/natolive/footix` (tags `latest` et commit), copie `docker-compose.prod.yml` sur le serveur puis y fait
-`docker compose pull && up -d`. Le serveur ne contient que `~/footix/{docker-compose.prod.yml,.env}` : ni code, ni build.
+`docker compose pull && up -d`, puis supprime les anciennes images footix (seule celle en service reste). Le serveur ne contient que `~/footix/{docker-compose.prod.yml,.env}` : ni code, ni build.
 Migrations appliquées au démarrage de l'API, base et API non exposées.
 
 Mise en place, une fois :
@@ -149,4 +151,4 @@ Mise en place, une fois :
 4. Premier push sur `main`, puis créer son compte et passer super admin :
    `docker compose -f docker-compose.prod.yml exec db psql -U footix -c "UPDATE users SET role = 'super_admin' WHERE email = '…'"`.
 
-Revenir à une version : sur le serveur, `IMAGE_TAG=<commit> docker compose -f docker-compose.prod.yml up -d`.
+Revenir à une version (image retirée de ghcr.io, plus gardée sur le serveur) : sur le serveur, `IMAGE_TAG=<commit> docker compose -f docker-compose.prod.yml up -d`.
