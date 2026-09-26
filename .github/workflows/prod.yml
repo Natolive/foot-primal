@@ -83,6 +83,8 @@ jobs:
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
           echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
           scp docker-compose.prod.yml "$SSH_TARGET":footix/
+          # Nettoyage : chaque déploiement laisse l'image taguée du commit précédent, que `prune` seul ne retire pas.
+          # `rmi` supprime les anciennes versions de footix (Docker garde celle utilisée) ; `prune` les postgres sans tag.
           # Jeton du job, clé et expéditeur Brevo passés sur l'entrée standard : jamais en ligne de commande ni dans les logs.
           # Le serveur n'a aucun identifiant GitHub à garder ; BREVO_API_KEY (secret) et MAIL_FROM (variable) de
           # l'environnement GitHub font référence et sont recopiés dans son .env.
@@ -97,4 +99,4 @@ jobs:
             && export IMAGE_TAG=${{ github.sha }} \
             && docker compose -f docker-compose.prod.yml pull \
             && docker compose -f docker-compose.prod.yml up -d \
-            && docker image prune -f; docker logout ghcr.io"
+            && (docker rmi \$(docker images -q ghcr.io/natolive/footix) 2>/dev/null; docker image prune -f); docker logout ghcr.io"
