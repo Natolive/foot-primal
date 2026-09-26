@@ -16,7 +16,7 @@ export interface Event {
 export type NewEvent = Omit<Event, 'id' | 'createdAt'>;
 
 // Réponse d'une personne au sondage d'un créneau, dans l'ordre des réponses.
-export type Participant = Pick<User, 'id' | 'firstName' | 'lastName'> & { eventId: string; attending: boolean };
+export type Participant = Pick<User, 'id' | 'email' | 'firstName' | 'lastName'> & { eventId: string; attending: boolean };
 
 // Personne sans compte ramenée par un inscrit, dans l'ordre d'ajout.
 export interface Guest {

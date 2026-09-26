@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import type { AddGuestDto, AnswerEventDto, EventDto, SaveEventDto, UserDto } from '@footix/shared';
 import { BaseService } from '../../common/application/base.service.js';
+import { eventCancelledMail } from '../../mail/application/templates/event-cancelled.mail.js';
 import { eventRegistrationMail } from '../../mail/application/templates/event-registration.mail.js';
 import { Mailer } from '../../mail/domain/mailer.js';
 import {
@@ -50,6 +51,20 @@ export class EventsService extends BaseService<Event, NewEvent> {
     const taken = participants.filter((p) => p.attending).length + guests.length;
     if (taken > dto.maxParticipants) throw new TooFewPlacesError(taken);
     return toEventDto(await this.update(id, dto), participants, guests);
+  }
+
+  // Les inscrits qui venaient sont prévenus par email, sauf si le match a déjà commencé.
+  async deleteEvent(id: string): Promise<void> {
+    const event = await this.findById(id);
+    const participants = await this.repository.findParticipants([id]);
+    await this.delete(id);
+    if (event.startsAt <= new Date()) return;
+    // ponytail: email perdu s'il échoue (pas de renvoi), la suppression reste faite.
+    await Promise.all(
+      participants
+        .filter((p) => p.attending)
+        .map((p) => this.mailer.send(eventCancelledMail(p, event)).catch((e) => this.logger.error(`Annulation non envoyée à ${p.email}`, e))),
+    );
   }
 
   // Premier « je viens » qui prend une place : email de confirmation avec le match en .ics (une seule fois).

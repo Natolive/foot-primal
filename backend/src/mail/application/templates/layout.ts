@@ -3,6 +3,10 @@ import { html, type SafeHtml } from '../html.js';
 // Adresse du front, pour les liens des emails.
 export const appUrl = (path: string) => `${process.env.APP_URL}${path}`;
 
+// Date et heure d'un match, en heure de Paris (« jeudi 1 octobre 2026 à 18:30 »).
+export const when = (d: Date) =>
+  new Intl.DateTimeFormat('fr-FR', { dateStyle: 'full', timeStyle: 'short', timeZone: 'Europe/Paris' }).format(d);
+
 // Couleurs de l'appli (frontend/app/assets/css/main.css), en dur : les clients mail ignorent les variables CSS.
 const GREEN = '#15803d';
 const NIGHT = '#062112';

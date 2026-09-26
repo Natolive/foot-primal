@@ -26,6 +26,7 @@ export class DrizzleEventRepository extends DrizzleRepository<typeof events, Eve
         eventId: eventParticipants.eventId,
         attending: eventParticipants.attending,
         id: users.id,
+        email: users.email,
         firstName: users.firstName,
         lastName: users.lastName,
       })

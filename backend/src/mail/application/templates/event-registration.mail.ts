@@ -1,10 +1,7 @@
 import type { Mail } from '../../domain/mailer.js';
 import { html } from '../html.js';
 import { ics } from '../ics.js';
-import { appUrl, button, layout, note, paragraph } from './layout.js';
-
-const when = (d: Date) =>
-  new Intl.DateTimeFormat('fr-FR', { dateStyle: 'full', timeStyle: 'short', timeZone: 'Europe/Paris' }).format(d);
+import { appUrl, button, layout, note, paragraph, when } from './layout.js';
 
 export const eventRegistrationMail = (
   to: { email: string; firstName: string },

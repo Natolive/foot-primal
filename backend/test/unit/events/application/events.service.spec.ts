@@ -98,6 +98,20 @@ describe('EventsService', () => {
     expect(await events.updateEvent(id, { ...match(2, 2), location: 'Five' })).toMatchObject({ location: 'Five', maxParticipants: 2 });
   });
 
+  it('emails those coming when their upcoming event is deleted', async () => {
+    const [lea, max] = await Promise.all(['Léa', 'Max'].map((n) => users.create(person(n))));
+    const { id } = await events.createEvent(match(1, 4));
+    await events.answer(id, lea, yes);
+    await events.answer(id, max, no);
+    mailer.sent = [];
+    await events.deleteEvent(id);
+    expect(mailer.sent.map((m) => [m.to.email, m.subject])).toEqual([['Léa@solem.fr', 'Match annulé : Foot du jeudi']]);
+    const past = await repository.create(match(-1));
+    await repository.answer(past.id, lea.id, true);
+    await events.deleteEvent(past.id);
+    expect(mailer.sent).toHaveLength(1);
+  });
+
   describe('guests', () => {
     it('takes a place, only for someone coming, and refuses when full', async () => {
       const [lea, max] = await Promise.all(['Léa', 'Max'].map((n) => users.create(person(n))));

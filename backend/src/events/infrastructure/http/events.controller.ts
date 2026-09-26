@@ -42,7 +42,7 @@ export class EventsController {
   @HttpCode(204)
   @Authorize('planning.delete_event')
   delete(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
-    return this.events.delete(id);
+    return this.events.deleteEvent(id);
   }
 
   // Réponse de la personne connectée au sondage : « je viens » ou « je ne viens pas ».

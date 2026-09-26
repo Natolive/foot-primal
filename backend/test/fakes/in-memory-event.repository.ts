@@ -19,7 +19,7 @@ export class InMemoryEventRepository extends InMemoryRepository<Event, NewEvent>
   async findParticipants(eventIds: string[]) {
     return this.participations
       .filter((p) => eventIds.includes(p.eventId))
-      .map(({ eventId, userId, attending }) => ({ eventId, attending, ...this.person(userId) }));
+      .map(({ eventId, userId, attending }) => ({ eventId, attending, ...this.person(userId), email: this.users.rows.find((u) => u.id === userId)!.email }));
   }
 
   async findGuests(eventIds: string[]) {
